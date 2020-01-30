@@ -34,6 +34,8 @@ Topic Name | Message Tpye | Message Descriptison
 /odometry/filtered | nav_msgs/Odometry | A filtered local-ization estimate based on wheel odometry (en-coders) and integrated IMU from Warthog
 /os1_cloud_node/imu | sensor_msgs/Imu | Raw imu data from embeded imu of Ouster Lidar
 /os1_cloud_node/points | sensor_msgs/PointCloud2 | Point cloud data from Ouster Lidar
+/os1_node/imu_packets | ouster_ros/PacketMsg | Raw imu data from Ouster Lidar
+/os1_node/lidar_packets | ouster_ros/PacketMsg | Raw lidar data from Ouster Lidar
 /vectornav/GPS | sensor_msgs/NavSatFix | INS data from VectorNav-VN300
 /vectornav/IMU | sensor_msgs/Imu | Imu data from VectorNav-VN300
 /vectornav/Mag | sensor_msgs/MagneticField | Raw magnetic field data from VectorNav-VN300
