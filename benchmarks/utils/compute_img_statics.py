@@ -128,12 +128,14 @@ if __name__ == "__main__":
     x = list(range(len(label_dict)))
     for i in label_dict.keys(): 
         count_dict[i]=count_dict[i] if i in count_dict.keys() else 0 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(40,10))
+    #fig,ax = plt.figure(figsize=(20,20))
     print(count_dict.keys(),x)
     rects = ax.bar(x,count_dict.values())
     ax.set_xticks(x)
     ax.set_xticklabels(label_dict.values())
-    plt.show()
+    #plt.show()
     plt.savefig(f"{args.name}.png")
+    plt.show()
 
     
