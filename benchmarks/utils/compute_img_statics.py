@@ -132,7 +132,7 @@ if __name__ == "__main__":
 
     #fig,ax = plt.figure(figsize=(20,20))
     print(count_dict.keys(),x)
-    plt.title(f"{args.name}.png",fontsize = 20.0)
+    plt.title(f"{args.name}",fontsize = 20.0)
     plt.rcParams.update({'font.size': 40})
     rects = ax.bar(x,count_dict.values())
     ax.set_xticks(x)
