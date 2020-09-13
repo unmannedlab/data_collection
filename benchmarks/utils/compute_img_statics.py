@@ -138,6 +138,6 @@ if __name__ == "__main__":
     ax.set_xticklabels(label_dict.values(),fontsize = 15.0)
     #plt.show()
     plt.savefig(f"{args.name}.png")
-    plt.show()
+    #plt.show()
 
     
