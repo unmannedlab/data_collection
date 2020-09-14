@@ -129,7 +129,8 @@ if __name__ == "__main__":
     for i in label_dict.keys(): 
         count_dict[i]=count_dict[i] if i in count_dict.keys() else 0 
     fig, ax = plt.subplots(figsize=(40,10))
-
+    count_dict = dict(sorted(count_dict.items()))
+    print(count_dict)
     #fig,ax = plt.figure(figsize=(20,20))
     print(count_dict.keys(),x)
     plt.title(f"{args.name}",fontsize = 20.0)
