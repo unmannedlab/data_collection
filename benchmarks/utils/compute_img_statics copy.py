@@ -13,7 +13,7 @@ from sklearn.utils.class_weight import compute_class_weight
 
 def compute_var(sq_num, el_num, b, m, axis=None):
     print(b*m*sq_num.sum(axis=axis), m*(el_num.sum(axis=axis))**2)
-    return (-sq_num.sum(axis=axis)+m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
+    return (b*m*sq_num.sum(axis=axis)-m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
 
 
 def is_scan(filename, extensions):
@@ -178,7 +178,7 @@ def count_weight(label_paths, num_workers):
     label = np.array(res)
     classes = np.unique(label_mapping)
     weight = compute_class_weight(None,classes,label)
-    return weight
+    return count_dict
 
 
 def count_label(label_paths, num_workers):
@@ -228,11 +228,11 @@ if __name__ == "__main__":
     with open(f"{args.name}_statics.txt", "w") as f:
         for k in count_dict:
             f.write(f"{label_dict[k]}: {count_dict[k]}\n")
-        f.write(f"mean: {img_statics['img_mean']}\n")
+        f.write(f"mean: {img_statics['img_mean']}")
         f.write(f"var: {img_statics['img_var']}")
-        f.write(f"std: {np.sqrt(img_statics['img_var'])}\n")
-        f.write(f"min: {img_statics['img_min']}\n")
-        f.write(f"max: {img_statics['img_max']}\n")
-        f.write(f"weight: {weight}")
+        f.write(f"std: {np.sqrt(img_statics['img_var'])}")
+        f.write(f"min: {img_statics['img_min']}")
+        f.write(f"max: {img_statics['img_max']}")
 
+            
 
