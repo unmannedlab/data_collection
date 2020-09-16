@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 def compute_var(sq_num, el_num, b, m, axis=None):
     print(b*m*sq_num.sum(axis=axis), m*(el_num.sum(axis=axis))**2)
-    return (b*m*sq_num.sum(axis=axis)-m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
+    return (-sq_num.sum(axis=axis)+m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
 
 
 def is_scan(filename, extensions):
@@ -101,11 +101,11 @@ def single_count(file_path):
 
 
 def single_compute(file_path):
-    img = np.array(Image.open(file_path))
-    img_mean = np.mean(img, axis=0)
-    img_sq_mean = np.mean(np.square(img), axis=0)
-    img_min = np.min(img, axis=0)
-    img_max = np.max(img, axis=0)
+    img = np.array(Image.open(file_path))/255.0
+    img_mean = np.mean(img, axis=(0,1))
+    img_sq_mean = np.mean(np.square(img), axis=(0,1))
+    img_min = np.min(img, axis=(0,1))
+    img_max = np.max(img, axis=(0,1))
     # print(scan_mean,scan_max,scan_max,scan_sq_mean,scan_count)
     res = {
         "img_mean": img_mean,
@@ -131,10 +131,12 @@ def compute_meanstd(imglist, num_worker):
     img_min_arr = np.array([ent['img_min'] for ent in res])
     img_max_arr = np.array([ent['img_max'] for ent in res])
     img_mean = np.mean(img_mean_arr,axis=0)
-    img_var = compute_var(img_sq_mean_arr,img_mean_arr,b,m)
+    img_var = compute_var(img_sq_mean_arr,img_mean_arr,b,m,axis=0)
     img_min = np.min(img_min_arr,axis=0)
     img_max = np.max(img_max_arr,axis=0)
-    return {"img_mean": img_mean,"img_var":img_var,"img_min":img_min,"img_max":img_max}
+    res = {"img_mean": img_mean,"img_var":img_var,"img_min":img_min,"img_max":img_max}
+    print(res)
+    return res
 
 def count_label(label_paths, num_workers):
     start_time = time.time()
@@ -182,8 +184,8 @@ if __name__ == "__main__":
     with open(f"{args.name}_statics.txt","w") as f:
         for k in count_dict:
             f.write(f"{label_dict[k]}: {count_dict[k]}\n")
-        f.write(f"mean: {img_statics['img_mean']}")
-        f.write(f"var: {img_statics['img_var']}")
-        f.write(f"std: {np.sqrt(img_statics['img_var'])}")
-        f.write(f"min: {img_statics['img_min']}")
-        f.write(f"max: {img_statics['img_max']}")
+        f.write(f"mean: {img_statics['img_mean']}\n")
+        f.write(f"var: {img_statics['img_var']}\n")
+        f.write(f"std: {np.sqrt(img_statics['img_var'])}\n")
+        f.write(f"min: {img_statics['img_min']}\n")
+        f.write(f"max: {img_statics['img_max']}\n")
