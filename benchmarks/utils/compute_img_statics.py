@@ -7,10 +7,17 @@ import multiprocessing
 import matplotlib.pyplot as plt
 import os
 import time
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
-def is_scan(filename,extensions):
+
+def compute_var(sq_num, el_num, b, m, axis=None):
+    print(b*m*sq_num.sum(axis=axis), m*(el_num.sum(axis=axis))**2)
+    return (b*m*sq_num.sum(axis=axis)-m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
+
+
+def is_scan(filename, extensions):
     return any(filename.endswith(ext) for ext in extensions)
+
 
 def get_files_list(root_path, sequences, datafolder_name, extensions):
     if os.path.isdir(root_path):
@@ -41,9 +48,6 @@ def get_files_list(root_path, sequences, datafolder_name, extensions):
     return files_list
 
 
-def compute_meanstd():
-    pass
-
 label_dict = {0: "0_uknown",
               3: "3_grass",
               4: "4_tree",
@@ -66,7 +70,8 @@ label_dict = {0: "0_uknown",
               33: "33_mud",
               34: "34_rubble"}
 
-def count_labels(labellist,num_worker):
+
+def count_labels(labellist, num_worker):
     start_time = time.time()
     pool = multiprocessing.Pool(processes=num_worker)
     res = pool.map(single_count, labellist)
@@ -75,25 +80,63 @@ def count_labels(labellist,num_worker):
     for elm in res:
         for key in elm.keys():
             if key in count_dict.keys():
-                count_dict[key]=count_dict[key]+elm[key]
+                count_dict[key] = count_dict[key]+elm[key]
             else:
                 count_dict[key] = elm[key]
-    print("Compute time:",time.time()-start_time)
+    print("Compute time:", time.time()-start_time)
     return count_dict
+
 
 def read_img(img_label_path):
     img_label = np.array(Image.open(img_label_path))
     img_label = img_label[:, :, 0]
     return img_label
 
+
 def single_count(file_path):
     label = np.array(Image.open(file_path))
     label = label[:, :, 0]
-    unique, unique_counts = np.unique(label,return_counts = True)
-    #print(unique,unique_counts)
-    return {i:j for i,j in zip(unique,unique_counts)}
+    unique, unique_counts = np.unique(label, return_counts=True)
+    return {i: j for i, j in zip(unique, unique_counts)}
 
-def count_label(label_paths,num_workers):
+
+def single_compute(file_path):
+    img = np.array(Image.open(file_path))
+    img_mean = np.mean(img, axis=0)
+    img_sq_mean = np.mean(np.square(img), axis=0)
+    img_min = np.min(img, axis=0)
+    img_max = np.max(scan, axis=0)
+    # print(scan_mean,scan_max,scan_max,scan_sq_mean,scan_count)
+    res = {
+        "img_mean": img_mean,
+        "img_sq_mean": img_sq_mean,
+        "img_min": img_min,
+        "img_max": img_max
+    }
+    return img
+
+
+def compute_meanstd(imglist, num_worker):
+    start_time = time.time()
+    pool = multiprocessing.Pool(processes=num_worker)
+    res = pool.map(single_compute, imglist)
+    pool.close()
+    b = len(imglist)
+    img = np.array(Image.open(imglist[0]))
+    img_size = img.shape
+    m = img_size[1]*img_size[2]
+
+    img_mean_arr = np.array([ent for ent['img_mean'] in res])
+    img_sq_mean_arr = np.array([ent for ent['img_sq_mean'] in res])
+    img_min_arr = np.array([ent for ent['img_min'] in res])
+    img_max_arr = np.array([ent for ent['img_max'] in res])
+    img_mean = np.mean(img_mean_arr,axis=0)
+    img_var = compute_var(img_sq_mean_arr,img_mean_arr,b,m)
+    img_min = np.min(img_min_arr,axis=0)
+    img_max = np.max(img_max_arr,axis=0)
+    return {"img_mean": img_mean,"img_var":img_var,"img_min":img_min,"img_max":img_max}
+
+def count_label(label_paths, num_workers):
     start_time = time.time()
     pool = multiprocessing.Pool(processes=num_workers)
     res = pool.map(single_count, label_paths)
@@ -102,44 +145,46 @@ def count_label(label_paths,num_workers):
     for elm in res:
         for key in elm.keys():
             if key in count_dict.keys():
-                count_dict[key]=count_dict[key]+elm[key]
+                count_dict[key] = count_dict[key]+elm[key]
             else:
                 count_dict[key] = elm[key]
-    print("Compute time:",time.time()-start_time)
+    print("Compute time:", time.time()-start_time)
     return count_dict
-
-
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", '-p')
     parser.add_argument("--sequence", '-s', nargs='+')
-    parser.add_argument("--num_workers",type=int)
-    parser.add_argument("--name",type=str)
+    parser.add_argument("--num_workers", type=int)
+    parser.add_argument("--name", type=str)
     args = parser.parse_args()
 
     rootpath = args.path
     seq = args.sequence
-    labellist = get_files_list(rootpath,seq, "pylon_camera_node_label_id",[".png"])
-    #labellist = get_files_list(rootpath,seq, "F8_annotation_files",[".png"])
-    imglist = get_files_list(rootpath,seq, "pylon_camera_node_label_color",[".png"])
-    count_dict = count_label(labellist,args.num_workers)
+    labellist = get_files_list(
+        rootpath, seq, "pylon_camera_node_label_id", [".png"])
+    imglist = get_files_list(
+        rootpath, seq, "pylon_camera_node_label_color", [".png"])
+    count_dict = count_label(labellist, args.num_workers)
+    img_statics = compute_meanstd(imglist,args.num_workers)
     x = list(range(len(label_dict)))
-    for i in label_dict.keys(): 
-        count_dict[i]=count_dict[i] if i in count_dict.keys() else 0 
-    fig, ax = plt.subplots(figsize=(40,10))
+    for i in label_dict.keys():
+        count_dict[i] = count_dict[i] if i in count_dict.keys() else 0
+    fig, ax = plt.subplots(figsize=(40, 10))
     count_dict = dict(sorted(count_dict.items()))
-    print(count_dict)
-    #fig,ax = plt.figure(figsize=(20,20))
-    print(count_dict.keys(),x)
-    plt.title(f"{args.name}",fontsize = 20.0)
+    plt.title(f"{args.name}", fontsize=20.0)
     plt.rcParams.update({'font.size': 40})
-    rects = ax.bar(x,count_dict.values())
+    rects = ax.bar(x, count_dict.values())
     ax.set_xticks(x)
-    ax.set_xticklabels(label_dict.values(),fontsize = 15.0)
-    #plt.show()
+    ax.set_xticklabels(label_dict.values(), fontsize=15.0)
     plt.savefig(f"{args.name}.png")
-    #plt.show()
-
-    
+    with open(f"{args.name}_statics.txt","w") as f:
+        for k in count_dict:
+            f.write(f"{label_dict[k]}: {count_dict[k]}\n")
+        
+        f.write(f"mean: {img_statics["img_mean"]}")
+        f.write(f"var: {img_statics["img_var"]}")
+        f.write(f"std: {np.sqrt(img_statics["img_var"])}")
+        f.write(f"min: {img_statics["img_min"]}")
+        f.write(f"max: {img_statics["img_max"]}")
