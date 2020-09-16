@@ -179,10 +179,14 @@ def count_weight(label_paths, num_workers):
     print(label.shape)
     label = label.flatten()
     classes = [i for i in label_mapping.values()]
+    real_classes = np.unique(classes)
     classes = np.unique(label)
     print(classes,label)
     weight = compute_class_weight("balanced",classes,label)
-    return weight
+    res = np.zeros(len(real_classes))
+    for v,k in enumerate(classes):
+        res[k] = weight[v] 
+    return res
 
 
 def count_label(label_paths, num_workers):
