@@ -135,10 +135,10 @@ def single_map(file_path):
 
 def single_compute(file_path):
     img = np.array(Image.open(file_path))
-    img_mean = np.mean(img, axis=0)
-    img_sq_mean = np.mean(np.square(img), axis=0)
-    img_min = np.min(img, axis=0)
-    img_max = np.max(img, axis=0)
+    img_mean = np.mean(img, axis=(0,1))
+    img_sq_mean = np.mean(np.square(img), axis=(0,1))
+    img_min = np.min(img, axis=(0,1))
+    img_max = np.max(img, axis=(0,1))
     # print(scan_mean,scan_max,scan_max,scan_sq_mean,scan_count)
     res = {
         "img_mean": img_mean,
@@ -176,10 +176,12 @@ def count_weight(label_paths, num_workers):
     res = pool.map(single_map, label_paths)
     pool.close()
     label = np.array(res)
-    print(shape)
+    print(label.shape)
     label = label.flatten()
-    classes = np.unique(label_mapping)
-    weight = compute_class_weight(None,classes,label)
+    classes = [i for i in label_mapping.values()]
+    classes = np.unique(label)
+    print(classes,label)
+    weight = compute_class_weight("balanced",classes,label)
     return weight
 
 
