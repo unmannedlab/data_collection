@@ -182,9 +182,8 @@ if __name__ == "__main__":
     with open(f"{args.name}_statics.txt","w") as f:
         for k in count_dict:
             f.write(f"{label_dict[k]}: {count_dict[k]}\n")
-        
-        f.write(f"mean: {img_statics["img_mean"]}")
-        f.write(f"var: {img_statics["img_var"]}")
-        f.write(f"std: {np.sqrt(img_statics["img_var"])}")
-        f.write(f"min: {img_statics["img_min"]}")
-        f.write(f"max: {img_statics["img_max"]}")
+        f.write(f"mean: {img_statics['img_mean']}")
+        f.write(f"var: {img_statics['img_var']}")
+        f.write(f"std: {np.sqrt(img_statics['img_var'])}")
+        f.write(f"min: {img_statics['img_min']}")
+        f.write(f"max: {img_statics['img_max']}")
