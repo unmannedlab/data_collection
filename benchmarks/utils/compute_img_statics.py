@@ -170,6 +170,14 @@ def compute_meanstd(imglist, num_worker):
     return {"img_mean": img_mean, "img_var": img_var, "img_min": img_min, "img_max": img_max}
 
 
+def calculateWeights(target,classes,norm = True):
+    hist = np.histogram(target.flatten(), classes), normed=True)[0]
+    if norm:
+        hist = ((hist != 0) * self.upper_bound * (1 / hist)) + 1
+    else:
+        hist = ((hist != 0) * self.upper_bound * (1 - hist)) + 1
+    return hist
+
 def count_weight(label_paths, num_workers):
     start_time = time.time()
     pool = multiprocessing.Pool(processes=num_workers)
@@ -182,11 +190,8 @@ def count_weight(label_paths, num_workers):
     real_classes = np.unique(classes)
     classes = np.unique(label)
     print(classes,label)
-    weight = compute_class_weight("balanced",classes,label)
-    res = np.zeros(len(real_classes))
-    for v,k in enumerate(classes):
-        res[k] = weight[v] 
-    return res
+    weight = calculateWeights(label,classes)
+    return weight
 
 
 def count_label(label_paths, num_workers):
