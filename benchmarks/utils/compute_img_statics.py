@@ -105,7 +105,7 @@ def single_compute(file_path):
     img_mean = np.mean(img, axis=0)
     img_sq_mean = np.mean(np.square(img), axis=0)
     img_min = np.min(img, axis=0)
-    img_max = np.max(scan, axis=0)
+    img_max = np.max(img, axis=0)
     # print(scan_mean,scan_max,scan_max,scan_sq_mean,scan_count)
     res = {
         "img_mean": img_mean,
@@ -126,10 +126,10 @@ def compute_meanstd(imglist, num_worker):
     img_size = img.shape
     m = img_size[1]*img_size[2]
 
-    img_mean_arr = np.array([ent for ent['img_mean'] in res])
-    img_sq_mean_arr = np.array([ent for ent['img_sq_mean'] in res])
-    img_min_arr = np.array([ent for ent['img_min'] in res])
-    img_max_arr = np.array([ent for ent['img_max'] in res])
+    img_mean_arr = np.array([ent['img_mean'] for ent in res])
+    img_sq_mean_arr = np.array([ent['img_sq_mean'] for ent in res])
+    img_min_arr = np.array([ent['img_min'] for ent in res])
+    img_max_arr = np.array([ent['img_max'] for ent in res])
     img_mean = np.mean(img_mean_arr,axis=0)
     img_var = compute_var(img_sq_mean_arr,img_mean_arr,b,m)
     img_min = np.min(img_min_arr,axis=0)
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     labellist = get_files_list(
         rootpath, seq, "pylon_camera_node_label_id", [".png"])
     imglist = get_files_list(
-        rootpath, seq, "pylon_camera_node_label_color", [".png"])
+        rootpath, seq, "pylon_camera_node", [".jpg"])
     count_dict = count_label(labellist, args.num_workers)
     img_statics = compute_meanstd(imglist,args.num_workers)
     x = list(range(len(label_dict)))
