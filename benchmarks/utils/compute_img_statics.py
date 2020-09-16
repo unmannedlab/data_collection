@@ -176,6 +176,8 @@ def count_weight(label_paths, num_workers):
     res = pool.map(single_map, label_paths)
     pool.close()
     label = np.array(res)
+    print(shape)
+    label = label.flatten()
     classes = np.unique(label_mapping)
     weight = compute_class_weight(None,classes,label)
     return weight
