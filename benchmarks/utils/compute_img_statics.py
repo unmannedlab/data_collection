@@ -113,7 +113,7 @@ def single_compute(file_path):
         "img_min": img_min,
         "img_max": img_max
     }
-    return img
+    return res
 
 
 def compute_meanstd(imglist, num_worker):
