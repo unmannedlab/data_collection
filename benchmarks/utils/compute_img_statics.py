@@ -248,6 +248,9 @@ if __name__ == "__main__":
         f.write(f"std: {np.sqrt(img_statics['img_var'])}\n")
         f.write(f"min: {img_statics['img_min']}\n")
         f.write(f"max: {img_statics['img_max']}\n")
-        f.write(f"weight: {weight}")
+        f.write(f"weight: [")
+        for w in weight:
+            f.write(f"{w}, ")
+        f.write("]")
 
 
