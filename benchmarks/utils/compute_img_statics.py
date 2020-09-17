@@ -134,7 +134,7 @@ def single_map(file_path):
 
 
 def single_compute(file_path):
-    img = np.array(Image.open(file_path))
+    img = np.array(Image.open(file_path))/255.0
     img_mean = np.mean(img, axis=(0,1))
     img_sq_mean = np.mean(np.square(img), axis=(0,1))
     img_min = np.min(img, axis=(0,1))
