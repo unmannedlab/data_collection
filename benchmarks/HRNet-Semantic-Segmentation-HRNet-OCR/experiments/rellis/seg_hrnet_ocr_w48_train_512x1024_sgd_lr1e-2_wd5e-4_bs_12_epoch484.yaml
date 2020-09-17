@@ -11,8 +11,8 @@ PRINT_FREQ: 10
 DATASET:
   DATASET: rellis
   ROOT: /home/usl/Datasets/rellis/
-  TEST_SET: '/home/usl/Code/Peng/data_collection/benchmarks/HRNet-Semantic-Segmentation-HRNet-OCR/data/list/rellis/val.lst'
-  TRAIN_SET: '/home/usl/Code/Peng/data_collection/benchmarks/HRNet-Semantic-Segmentation-HRNet-OCR/data/list/rellis/train.lst'
+  TEST_SET: 'val.lst'
+  TRAIN_SET: 'train.lst'
   NUM_CLASSES: 17
 MODEL:
   NAME: seg_hrnet_ocr
@@ -78,7 +78,7 @@ TRAIN:
   - 1024
   - 640
   BASE_SIZE: 1920
-  BATCH_SIZE_PER_GPU: 3
+  BATCH_SIZE_PER_GPU: 4
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 484

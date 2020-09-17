@@ -192,7 +192,7 @@ def count_weight(label_paths, num_workers):
     real_classes = np.unique(classes)
     classes = np.unique(label)
     print(classes,label)
-    weight = calculateWeights(label,len(classes))
+    weight = calculateWeights(label,len(real_classes))
     return weight
 
 
