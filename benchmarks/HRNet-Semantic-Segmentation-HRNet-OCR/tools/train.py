@@ -89,6 +89,7 @@ def main():
     distributed = args.local_rank >= 0
     if distributed:
         device = torch.device('cuda:{}'.format(args.local_rank))    
+        print(device)
         torch.cuda.set_device(device)
         torch.distributed.init_process_group(
             backend="nccl", init_method="env://",

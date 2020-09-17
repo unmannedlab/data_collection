@@ -13,7 +13,7 @@ DATASET:
   ROOT: /home/usl/Datasets/rellis/
   TEST_SET: '/home/usl/Code/Peng/data_collection/benchmarks/HRNet-Semantic-Segmentation-HRNet-OCR/data/list/rellis/val.lst'
   TRAIN_SET: '/home/usl/Code/Peng/data_collection/benchmarks/HRNet-Semantic-Segmentation-HRNet-OCR/data/list/rellis/train.lst'
-  NUM_CLASSES: 19
+  NUM_CLASSES: 17
 MODEL:
   NAME: seg_hrnet_ocr
   NUM_OUTPUTS: 2
