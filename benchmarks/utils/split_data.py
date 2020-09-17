@@ -66,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("--dl_name")
     parser.add_argument("--data_ext", nargs='+', type=str)
     parser.add_argument("--label_ext", nargs='+', type=str)
+    parser.add_argument("--output_name")
     args = parser.parse_args()
     print(args)
     root_path = args.root_path
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     label_ext = args.label_ext
     data_list = get_files_list(root_path,sequences,datafolder_name,data_ext)
     label_list = get_files_list(root_path,sequences,labelfolder_name,label_ext) 
-    datafilename = os.path.join(root_path,"train.lst")
+    datafilename = os.path.join(root_path,args.output_name)
     #labelfilename = os.path.join(root_path,"train_label.txt")
     print(datafilename)
     path_len = len(root_path)
