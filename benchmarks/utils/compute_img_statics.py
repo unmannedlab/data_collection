@@ -164,7 +164,7 @@ def compute_meanstd(imglist, num_worker):
     img_min_arr = np.array([ent['img_min'] for ent in res])
     img_max_arr = np.array([ent['img_max'] for ent in res])
     img_mean = np.mean(img_mean_arr, axis=0)
-    img_var = compute_var(img_sq_mean_arr, img_mean_arr, b, m)
+    img_var = compute_var(img_sq_mean_arr, img_mean_arr, b, m,axis=0)
     img_min = np.min(img_min_arr, axis=0)
     img_max = np.max(img_max_arr, axis=0)
     return {"img_mean": img_mean, "img_var": img_var, "img_min": img_min, "img_max": img_max}
@@ -244,7 +244,7 @@ if __name__ == "__main__":
         for k in count_dict:
             f.write(f"{label_dict[k]}: {count_dict[k]}\n")
         f.write(f"mean: {img_statics['img_mean']}\n")
-        f.write(f"var: {img_statics['img_var']}")
+        f.write(f"var: {img_statics['img_var']}\n")
         f.write(f"std: {np.sqrt(img_statics['img_var'])}\n")
         f.write(f"min: {img_statics['img_min']}\n")
         f.write(f"max: {img_statics['img_max']}\n")

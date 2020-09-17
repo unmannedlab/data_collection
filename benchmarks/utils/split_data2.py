@@ -42,8 +42,6 @@ def get_files_list(root_path, sequences, datafolder_name, extensions):
         scan_path = os.path.join(root_path, seq, datafolder_name)
 
         # get files
-        # scan_files = [os.path.join(dp, f) for dp, dn, fn in os.walk(
-        #     os.path.expanduser(scan_path)) for f in fn if is_scan(f,extensions)]
         scan_files = [os.path.join(dp, f) for dp, dn, fn in os.walk(
             os.path.expanduser(scan_path)) for f in fn if is_scan(f,extensions)]
 
@@ -76,13 +74,12 @@ if __name__ == "__main__":
     label_ext = args.label_ext
     data_list = get_files_list(root_path,sequences,datafolder_name,data_ext)
     label_list = get_files_list(root_path,sequences,labelfolder_name,label_ext) 
-    datafilename = os.path.join(root_path,"train.lst")
-    #labelfilename = os.path.join(root_path,"train_label.txt")
+    datafilename = os.path.join(root_path,"train_data.txt")
+    labelfilename = os.path.join(root_path,"train_label.txt")
     print(datafilename)
-    path_len = len(root_path)
     with open(datafilename,'w') as f:
-        for data_path,label_path in zip(data_list,label_list):
-            f.write(f'{data_path[path_len:]} {label_path[path_len:]}\n')
-    # with open(labelfilename,'w') as f:
-    #     for i in label_list:
-    #         f.write(i+'\n')
+        for i in data_list:
+            f.write(i+'\n')
+    with open(labelfilename,'w') as f:
+        for i in label_list:
+            f.write(i+'\n')
