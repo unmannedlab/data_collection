@@ -62,8 +62,8 @@ __C.REDUCE_BORDER_EPOCH= -1
 __C.STRICTBORDERCLASS= None
 
 __C.DATASET =AttrDict()
-__C.DATASET.CITYSCAPES_DIR='/home/username/data/cityscapes'
-__C.DATASET.RELLIS_DIR='/home/username/data/cityscapes'
+__C.DATASET.CITYSCAPES_DIR='/home/usl/Datasets/cityscapes'
+__C.DATASET.RELLIS_DIR='/home/usl/Datasets/rellis'
 __C.DATASET.CV_SPLITS=3
 
 __C.MODEL = AttrDict()
