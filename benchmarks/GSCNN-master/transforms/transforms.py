@@ -40,7 +40,8 @@ import torchvision.transforms as torch_tr
 from scipy import ndimage
 from config import cfg
 from scipy.ndimage.interpolation import shift
-from scipy.misc import imsave
+#from scipy.misc import imsave
+import imageio
 from skimage.segmentation import find_boundaries
 class RandomVerticalFlip(object):
     def __call__(self, img):
@@ -82,7 +83,7 @@ class RelaxedBoundaryLossToTensor(object):
 
         
         img_arr = np.array(img)
-        import scipy;scipy.misc.imsave('orig.png',img_arr)
+        imageio.imwrite('orig.png',img_arr)
 
         img_arr[img_arr==self.ignore_id]=self.num_classes       
         
