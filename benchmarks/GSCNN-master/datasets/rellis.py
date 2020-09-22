@@ -155,6 +155,7 @@ class Rellis(data.Dataset):
             return self._eval_get_item(img, mask_copy, self.eval_scales, self.eval_flip), img_name
 
         mask = Image.fromarray(mask_copy.astype(np.uint8))
+        print(mask.max(),mask.min())
 
         # Image Transformations
         if self.joint_transform is not None:
