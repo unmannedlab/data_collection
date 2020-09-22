@@ -63,6 +63,7 @@ __C.STRICTBORDERCLASS= None
 
 __C.DATASET =AttrDict()
 __C.DATASET.CITYSCAPES_DIR='/home/username/data/cityscapes'
+__C.DATASET.RELLIS_DIR='/home/username/data/cityscapes'
 __C.DATASET.CV_SPLITS=3
 
 __C.MODEL = AttrDict()

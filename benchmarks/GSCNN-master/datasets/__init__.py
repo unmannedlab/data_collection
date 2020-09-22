@@ -3,7 +3,7 @@ Copyright (C) 2019 NVIDIA Corporation.  All rights reserved.
 Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
 """
 
-from datasets import cityscapes
+from datasets import cityscapes, rellis
 import torchvision.transforms as standard_transforms
 import torchvision.utils as vutils
 import transforms.joint_transforms as joint_transforms
@@ -23,6 +23,15 @@ def setup_loaders(args):
             args.val_batch_size = args.bs_mult_val * args.ngpu
         else:
             args.val_batch_size = args.bs_mult * args.ngpu
+        mean_std = ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    elif args.dataset == "rellis":
+        args.dataset_cls = rellis
+        args.train_batch_size = args.bs_mult * args.ngpu
+        if args.bs_mult_val > 0:
+            args.val_batch_size = args.bs_mult_val * args.ngpu
+        else:
+            args.val_batch_size = args.bs_mult * args.ngpu
+        mean_std = ([0.496588, 0.59493099, 0.53358843], [0.496588, 0.59493099, 0.53358843])
     else:
         raise
 
@@ -30,7 +39,6 @@ def setup_loaders(args):
     if args.test_mode:
         args.num_workers = 0 #1
 
-    mean_std = ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
     # Geometric image transformations
     train_joint_transform_list = [
@@ -88,6 +96,19 @@ def setup_loaders(args):
             dump_images=args.dump_augmentation_images,
             cv_split=args.cv)
         val_set = args.dataset_cls.CityScapes('fine', 'val', 0, 
+                                              transform=val_input_transform,
+                                              target_transform=target_transform,
+                                              cv_split=args.cv)
+    elif args.dataset == 'rellis':
+        city_mode = 'train' 
+        train_set = args.dataset_cls.Rellis(
+            city_mode, 
+            joint_transform=train_joint_transform,
+            transform=train_input_transform,
+            target_transform=target_train_transform,
+            dump_images=args.dump_augmentation_images,
+            cv_split=args.cv)
+        val_set = args.dataset_cls.CityScapes('val',
                                               transform=val_input_transform,
                                               target_transform=target_transform,
                                               cv_split=args.cv)
