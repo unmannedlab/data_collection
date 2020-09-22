@@ -63,7 +63,7 @@ class Rellis(data.Dataset):
         self.list_path = list_paths[mode]
         self.img_list = [line.strip().split() for line in open(root+self.list_path)]
         self.files = self.read_files()
-        if len(self.imgs) == 0:
+        if len(self.files) == 0:
             raise RuntimeError('Found 0 images, please check the data set')
 
         self.mean_std = ([0.496588, 0.59493099, 0.53358843], [0.496588, 0.59493099, 0.53358843])
@@ -183,7 +183,7 @@ class Rellis(data.Dataset):
         return img, mask, edgemap, img_name
 
     def __len__(self):
-        return len(self.imgs)
+        return len(self.files)
 
 
 def make_dataset_video():
