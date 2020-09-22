@@ -108,7 +108,7 @@ def setup_loaders(args):
             target_transform=target_train_transform,
             dump_images=args.dump_augmentation_images,
             cv_split=args.cv)
-        val_set = args.dataset_cls.CityScapes('val',
+        val_set = args.dataset_cls.Rellis('val',
                                               transform=val_input_transform,
                                               target_transform=target_transform,
                                               cv_split=args.cv)
