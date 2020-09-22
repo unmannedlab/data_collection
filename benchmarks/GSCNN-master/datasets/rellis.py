@@ -140,11 +140,12 @@ class Rellis(data.Dataset):
     def __getitem__(self, index):
         item = self.files[index]
         img_name = item["name"]
-        img_path = item['img']
+        img_path = self.root + item['img']
+        label_path = self.root + item["label"]
 
         img = Image.open(img_path).convert('RGB')
 
-        mask = np.array(Image.open(os.path.join(self.root, item["label"])))
+        mask = np.array(Image.open(label_path))
         mask = mask[:, :, 0]
         
 
