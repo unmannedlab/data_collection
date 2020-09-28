@@ -201,6 +201,14 @@ class GSCNN(nn.Module):
 
         wide_resnet = wider_resnet38_a2(classes=1000, dilation=True)
         wide_resnet = torch.nn.DataParallel(wide_resnet)
+
+        try:
+            checkpoint = torch.load('./network/pretrained_models/wider_resnet38.pth.tar', map_location='cpu')
+            wide_resnet.load_state_dict(checkpoint['state_dict'])
+            del checkpoint
+        except:
+            print("Please download the ImageNet weights of WideResNet38 in our repo to ./pretrained_models/wider_resnet38.pth.tar.")
+            raise RuntimeError("=====================Could not load ImageNet weights of WideResNet38 network.=======================")    
         
         wide_resnet = wide_resnet.module
         self.mod1 = wide_resnet.mod1
@@ -319,7 +327,7 @@ class GSCNN(nn.Module):
         dec0 = torch.cat(dec0, 1)
 
         dec1 = self.final_seg(dec0)  
-        seg_out = self.interpolate(dec1, x_size[2:], mode='bilinear')            
+        seg_out = self.interpolate(dec1, x_size[2:], mode='bilinear')      
        
         if self.training:
             return self.criterion((seg_out, edge_out), gts)              

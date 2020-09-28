@@ -288,7 +288,6 @@ def print_evaluate_results(hist, iu, writer=None, epoch=0, dataset=None):
     iu_false_positive = hist.sum(axis=1) - np.diag(hist)
     iu_false_negative = hist.sum(axis=0) - np.diag(hist)
     iu_true_positive = np.diag(hist)
-
     logging.info('IoU:')
     logging.info('label_id      label    iU    Precision Recall TP     FP    FN')
     for idx, i in enumerate(iu):

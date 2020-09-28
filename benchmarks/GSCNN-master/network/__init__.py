@@ -13,8 +13,9 @@ def get_net(args, criterion):
     num_params = sum([param.nelement() for param in net.parameters()])
     logging.info('Model params = {:2.1f}M'.format(num_params / 1000000))
 
-    net = net.cuda()
-    net = torch.nn.DataParallel(net)
+    #net = net
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    net = torch.nn.DataParallel(net).to(device)
     return net
 
 

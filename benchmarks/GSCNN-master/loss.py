@@ -50,6 +50,7 @@ class JointEdgeSegLoss(nn.Module):
         elif mode == 'val':
             self.seg_loss = CrossEntropyLoss2d(size_average=True,
                                                ignore_index=ignore_index).cuda()
+        self.ignore_index = ignore_index
 
         self.edge_weight = edge_weight
         self.seg_weight = seg_weight
@@ -93,20 +94,19 @@ class JointEdgeSegLoss(nn.Module):
 
     def edge_attention(self, input, target, edge):
         n, c, h, w = input.size()
-        filler = torch.ones_like(target) * 255
+        filler = torch.ones_like(target) * self.ignore_index
         return self.seg_loss(input, 
                              torch.where(edge.max(1)[0] > 0.8, target, filler))
 
     def forward(self, inputs, targets):
         segin, edgein = inputs
         segmask, edgemask = targets
-
         losses = {}
 
         losses['seg_loss'] = self.seg_weight * self.seg_loss(segin, segmask)
         losses['edge_loss'] = self.edge_weight * 20 * self.bce2d(edgein, edgemask)
         losses['att_loss'] = self.att_weight * self.edge_attention(segin, segmask, edgein)
-        losses['dual_loss'] = self.dual_weight * self.dual_task(segin, segmask)
+        losses['dual_loss'] = self.dual_weight * self.dual_task(segin, segmask,ignore_pixel=self.ignore_index)
               
         return losses
 
@@ -134,6 +134,7 @@ class ImageBasedCrossEntropyLoss2d(nn.Module):
 
     def forward(self, inputs, targets):
         target_cpu = targets.data.cpu().numpy()
+        #print("loss",np.unique(target_cpu))
         if self.batch_weights:
             weights = self.calculateWeights(target_cpu)
             self.nll_loss.weight = torch.Tensor(weights).cuda()
@@ -143,7 +144,6 @@ class ImageBasedCrossEntropyLoss2d(nn.Module):
             if not self.batch_weights:
                 weights = self.calculateWeights(target_cpu[i])
                 self.nll_loss.weight = torch.Tensor(weights).cuda()
-            
             loss += self.nll_loss(F.log_softmax(inputs[i].unsqueeze(0)),
                                           targets[i].unsqueeze(0))
         return loss

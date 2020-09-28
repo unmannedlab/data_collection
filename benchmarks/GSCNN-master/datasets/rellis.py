@@ -107,7 +107,7 @@ class Rellis(data.Dataset):
         
     def read_files(self):
         files = []
-        if 'test' in self.list_path:
+        if 'test' in self.mode:
             for item in self.img_list:
                 image_path = item
                 name = os.path.splitext(os.path.basename(image_path[0]))[0]
@@ -128,6 +128,7 @@ class Rellis(data.Dataset):
         return files
 
     def convert_label(self, label, inverse=False):
+        
         temp = label.copy()
         if inverse:
             for v, k in self.label_mapping.items():
@@ -155,8 +156,6 @@ class Rellis(data.Dataset):
             return self._eval_get_item(img, mask_copy, self.eval_scales, self.eval_flip), img_name
 
         mask = Image.fromarray(mask_copy.astype(np.uint8))
-        print(mask.max(),mask.min())
-
         # Image Transformations
         if self.joint_transform is not None:
             img, mask = self.joint_transform(img, mask)
@@ -181,7 +180,6 @@ class Rellis(data.Dataset):
             mask_img = colorize_mask(np.array(mask))
             img.save(out_img_fn)
             mask_img.save(out_msk_fn)
-
         return img, mask, edgemap, img_name
 
     def __len__(self):
