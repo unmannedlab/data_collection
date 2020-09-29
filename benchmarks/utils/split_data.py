@@ -75,15 +75,18 @@ if __name__ == "__main__":
     labelfolder_name = args.dl_name
     data_ext = args.data_ext
     label_ext = args.label_ext
-    data_list = get_files_list(root_path,sequences,datafolder_name,data_ext)
+    #data_list = get_files_list(root_path,sequences,datafolder_name,data_ext)
     label_list = get_files_list(root_path,sequences,labelfolder_name,label_ext) 
     datafilename = os.path.join(root_path,args.output_name)
     #labelfilename = os.path.join(root_path,"train_label.txt")
     print(datafilename)
     path_len = len(root_path)
     with open(datafilename,'w') as f:
-        for data_path,label_path in zip(data_list,label_list):
-            f.write(f'{data_path[path_len:]} {label_path[path_len:]}\n')
+        for label_path in label_list:
+            datapath = label_list.copy()
+            datapath.replace(labelfolder_name,datafolder_name)
+            datapath.replace("png",'jpg')
+            f.write(f'{datapath} {label_path[path_len:]}\n')
     # with open(labelfilename,'w') as f:
     #     for i in label_list:
     #         f.write(i+'\n')
