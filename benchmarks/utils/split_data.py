@@ -83,7 +83,7 @@ if __name__ == "__main__":
     path_len = len(root_path)
     with open(datafilename,'w') as f:
         for label_path in label_list:
-            datapath = label_list.copy()
+            datapath = label_path[path_len:].copy()
             datapath.replace(labelfolder_name,datafolder_name)
             datapath.replace("png",'jpg')
             f.write(f'{datapath} {label_path[path_len:]}\n')
