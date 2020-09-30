@@ -119,27 +119,28 @@ class Rellis(Dataset):
         assert(isinstance(self.learning_map, dict))
 
         # make sure sequences is a list
-      assert(isinstance(self.sequences, str))
+        assert(isinstance(self.sequences, str))
 
-      # placeholder for filenames
-      self.file_list = [line.strip().split() for line in open(root+self.sequences)]
-      self.scan_files = []
-      self.label_files = []
+        # placeholder for filenames
+        print(root+self.sequences)
+        self.file_list = [line.strip().split() for line in open(root+self.sequences)]
+        self.scan_files = []
+        self.label_files = []
 
-      # fill in with names, checking that all sequences are complete
-      for item in self.file_list:
-          scan_path, label_path = item
-          scan_path = os.path.join(self.root, scan_path)
-          label_path = os.path.join(self.root, label_path)
-          self.scan_files.append(scan_path)
-          self.label_files.append(label_path)
+        # fill in with names, checking that all sequences are complete
+        for item in self.file_list:
+            scan_path, label_path = item
+            scan_path = os.path.join(self.root, scan_path)
+            label_path = os.path.join(self.root, label_path)
+            self.scan_files.append(scan_path)
+            self.label_files.append(label_path)
 
 
-          # sort for correspondance
-          self.scan_files.sort()
-          self.label_files.sort()
+        # sort for correspondance
+        self.scan_files.sort()
+        self.label_files.sort()
 
-          print("Using {} scans from sequences {}".format(len(self.scan_files),self.sequences))
+        print("Using {} scans from sequences {}".format(len(self.scan_files),self.sequences))
 
     def __getitem__(self, index):
         # get item in tensor shape
