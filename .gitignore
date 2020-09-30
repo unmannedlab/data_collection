@@ -139,6 +139,3 @@ cython_debug/
 
 *.mp4
 *.pyc
-benchmarks/SalsaNext/train/common/__pycache__/__init__.cpython-36.pyc
-benchmarks/SalsaNext/train/common/__pycache__/__init__.cpython-36.pyc
-benchmarks/SalsaNext/train/common/__pycache__/__init__.cpython-36.pyc
