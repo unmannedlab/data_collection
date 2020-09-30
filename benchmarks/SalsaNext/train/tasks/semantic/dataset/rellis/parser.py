@@ -122,7 +122,7 @@ class Rellis(Dataset):
       assert(isinstance(self.sequences, str))
 
       # placeholder for filenames
-      self.file_list = [line.strip().split() for line in open(root+self.list_path)]
+      self.file_list = [line.strip().split() for line in open(root+self.sequences)]
       self.scan_files = []
       self.label_files = []
 
