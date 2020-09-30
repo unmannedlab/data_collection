@@ -72,7 +72,7 @@ class SemanticKitti(Dataset):
                gt=True,
                transform=False):            # send ground truth?
     # save deats
-    self.root = os.path.join(root, "sequences")
+    self.root = root #os.path.join(root, "sequences")
     self.sequences = sequences
     self.labels = labels
     self.color_map = color_map
@@ -114,36 +114,20 @@ class SemanticKitti(Dataset):
     assert(isinstance(self.learning_map, dict))
 
     # make sure sequences is a list
-    assert(isinstance(self.sequences, list))
+    assert(isinstance(self.sequences, str))
 
     # placeholder for filenames
+    self.file_list = [line.strip().split() for line in open(root+self.list_path)]
     self.scan_files = []
     self.label_files = []
 
     # fill in with names, checking that all sequences are complete
-    for seq in self.sequences:
-      # to string
-      seq = '{0:02d}'.format(int(seq))
-
-      print("parsing seq {}".format(seq))
-
-      # get paths for each
-      scan_path = os.path.join(self.root, seq, "velodyne")
-      label_path = os.path.join(self.root, seq, "labels")
-
-      # get files
-      scan_files = [os.path.join(dp, f) for dp, dn, fn in os.walk(
-          os.path.expanduser(scan_path)) for f in fn if is_scan(f)]
-      label_files = [os.path.join(dp, f) for dp, dn, fn in os.walk(
-          os.path.expanduser(label_path)) for f in fn if is_label(f)]
-
-      # check all scans have labels
-      if self.gt:
-        assert(len(scan_files) == len(label_files))
-
-      # extend list
-      self.scan_files.extend(scan_files)
-      self.label_files.extend(label_files)
+    for item in self.file_list:
+        scan_path, label_path = item
+        scan_path = os.path.join(self.root, scan_path)
+        label_path = os.path.join(self.root, label_path)
+        self.scan_files.append(scan_path)
+        self.label_files.append(label_path)
 
     # sort for correspondance
     self.scan_files.sort()

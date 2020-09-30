@@ -59,7 +59,7 @@ def my_collate(batch):
 
     return data, project_mask,proj_labels
 
-class SemanticKitti(Dataset):
+class Rellis(Dataset):
 
   def __init__(self, root,    # directory where data is
                sequences,     # sequences for this data (e.g. [1,3,4,6])
@@ -73,7 +73,7 @@ class SemanticKitti(Dataset):
                transform=False):            # send ground truth?
     # save deats
     self.root = os.path.join(root, "sequences")
-    self.sequences = sequences
+    self.sequences_file_path = sequences
     self.labels = labels
     self.color_map = color_map
     self.learning_map = learning_map
