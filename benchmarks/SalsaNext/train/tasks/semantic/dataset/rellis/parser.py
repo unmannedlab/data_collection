@@ -77,7 +77,7 @@ class Rellis(Dataset):
                  gt=True,
                  transform=False):            # send ground truth?
         # save deats
-        self.root = os.path.join(root, "sequences")
+        self.root = root
         self.sequences = sequences
         self.labels = labels
         self.color_map = color_map
@@ -107,7 +107,7 @@ class Rellis(Dataset):
         if os.path.isdir(self.root):
             print("Sequences folder exists! Using sequences from %s" % self.root)
         else:
-            raise ValueError("Sequences folder doesn't exist! Exiting...")
+            raise ValueError("Sequences folder doesn't exist! Exiting...%s" % self.root)
 
         # make sure labels is a dict
         assert(isinstance(self.labels, dict))
@@ -122,8 +122,9 @@ class Rellis(Dataset):
         assert(isinstance(self.sequences, str))
 
         # placeholder for filenames
-        print(root+self.sequences)
-        self.file_list = [line.strip().split() for line in open(root+self.sequences)]
+
+        lst_path = os.path.join(self.root,self.sequences)
+        self.file_list = [line.strip().split() for line in open(lst_path)]
         self.scan_files = []
         self.label_files = []
 
@@ -134,7 +135,6 @@ class Rellis(Dataset):
             label_path = os.path.join(self.root, label_path)
             self.scan_files.append(scan_path)
             self.label_files.append(label_path)
-
 
         # sort for correspondance
         self.scan_files.sort()
@@ -324,7 +324,8 @@ class Parser():
                                                        shuffle=self.shuffle_train,
                                                        num_workers=self.workers,
                                                        drop_last=True)
-        assert len(self.trainloader) > 0
+        
+        assert len(self.trainloader) > 0, f"len(self.trainloader):{len(self.trainloader)}"
         self.trainiter = iter(self.trainloader)
 
         self.valid_dataset = Rellis(root=self.root,

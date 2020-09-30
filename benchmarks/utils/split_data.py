@@ -64,8 +64,8 @@ if __name__ == "__main__":
     parser.add_argument("--sequences", nargs='+', type=str)
     parser.add_argument("--df_name")
     parser.add_argument("--dl_name")
-    parser.add_argument("--data_ext", nargs='+', type=str)
-    parser.add_argument("--label_ext", nargs='+', type=str)
+    parser.add_argument("--data_ext", type=str)
+    parser.add_argument("--label_ext", type=str)
     parser.add_argument("--output_name")
     args = parser.parse_args()
     print(args)
@@ -77,11 +77,11 @@ if __name__ == "__main__":
     label_ext = args.label_ext
     label_list = get_files_list(root_path,sequences,labelfolder_name,label_ext) 
     datafilename = os.path.join(root_path,args.output_name)
-    print(datafilename)
+    print(datafilename,data_ext,label_ext)
     path_len = len(root_path)
     with open(datafilename,'w') as f:
         for label_path in label_list:
             datapath = label_path[path_len:]
-            datapath.replace(labelfolder_name,datafolder_name)
-            datapath.replace("png",'jpg')
+            datapath=datapath.replace(labelfolder_name,datafolder_name)
+            datapath=datapath.replace(label_ext,data_ext)
             f.write(f'{datapath} {label_path[path_len:]}\n')

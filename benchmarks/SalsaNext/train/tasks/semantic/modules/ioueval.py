@@ -23,7 +23,7 @@ class iouEval:
 
     def reset(self):
         self.conf_matrix = torch.zeros(
-            (self.n_classes, self.n_classes), device=self.device).long()
+            (self.n_classes, self.n_classes), device=self.device).float()
         self.ones = None
         self.last_scan_size = None  # for when variable scan size is used
 
@@ -44,7 +44,7 @@ class iouEval:
 
         # ones is what I want to add to conf when I
         if self.ones is None or self.last_scan_size != idxs.shape[-1]:
-            self.ones = torch.ones((idxs.shape[-1]), device=self.device).long()
+            self.ones = torch.ones((idxs.shape[-1]), device=self.device).float()
             self.last_scan_size = idxs.shape[-1]
 
         # make confusion matrix (cols = gt, rows = pred)
