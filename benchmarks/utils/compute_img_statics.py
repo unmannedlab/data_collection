@@ -12,7 +12,6 @@ from sklearn.utils.class_weight import compute_class_weight
 
 
 def compute_var(sq_num, el_num, b, m, axis=None):
-    print(b*m*sq_num.sum(axis=axis), m*(el_num.sum(axis=axis))**2)
     return (-sq_num.sum(axis=axis)+m*(el_num.sum(axis=axis))**2)/(b*(m*b-1))
 
 

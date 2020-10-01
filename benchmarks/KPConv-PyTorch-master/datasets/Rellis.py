@@ -7,7 +7,7 @@
 #
 # ----------------------------------------------------------------------------------------------------------------------
 #
-#      Class handling SemanticKitti dataset.
+#      Class handling Rellis dataset.
 #      Implements a Dataset, a Sampler, and a collate_fn
 #
 # ----------------------------------------------------------------------------------------------------------------------
@@ -52,10 +52,10 @@ from utils.config import bcolors
 
 
 class RellisDataset(PointCloudDataset):
-    """Class to handle SemanticKitti dataset."""
+    """Class to handle Rellis dataset."""
 
     def __init__(self, config, set='training', balance_classes=True):
-        PointCloudDataset.__init__(self, 'SemanticKitti')
+        PointCloudDataset.__init__(self, 'Rellis')
 
         ##########################
         # Parameters for the files
@@ -72,20 +72,30 @@ class RellisDataset(PointCloudDataset):
 
         # Get a list of sequences
         if self.set == 'training':
-            self.sequences = ['{:02d}'.format(i) for i in range(11) if i != 8]
+            self.sequences = 'pt_train.lst'
         elif self.set == 'validation':
-            self.sequences = ['{:02d}'.format(i) for i in range(11) if i == 8]
+            self.sequences = 'pt_val.lst'
         elif self.set == 'test':
-            self.sequences = ['{:02d}'.format(i) for i in range(11, 22)]
+            self.sequences = 'pt_test.lst'
         else:
-            raise ValueError('Unknown set for SemanticKitti data: ', self.set)
+            raise ValueError('Unknown set for Rellis data: ', self.set)
 
         # List all files in each sequence
+        lst_path = join(self.path,self.sequences)
+        self.file_list = [line.strip().split() for line in open(lst_path)]
         self.frames = []
-        for seq in self.sequences:
-            velo_path = join(self.path, 'sequences', seq, 'velodyne')
-            frames = np.sort([vf[:-4] for vf in listdir(velo_path) if vf.endswith('.bin')])
-            self.frames.append(frames)
+        self.label_files = []
+
+        # fill in with names, checking that all sequences are complete
+        for item in self.file_list:
+            scan_path, label_path = item
+            scan_path = join(self.path, scan_path)
+            self.frames.append(scan_path)
+            self.label_files.append(label_path)
+
+        # sort for correspondance
+        self.frames.sort()
+        self.label_files.sort()
 
         ###########################
         # Object classes parameters
@@ -93,9 +103,9 @@ class RellisDataset(PointCloudDataset):
 
         # Read labels
         if config.n_frames == 1:
-            config_file = join(self.path, 'semantic-kitti.yaml')
+            config_file = join(self.path, 'rellis.yaml')
         elif config.n_frames > 1:
-            config_file = join(self.path, 'semantic-kitti-all.yaml')
+            config_file = join(self.path, 'rellis.yaml')
         else:
             raise ValueError('number of frames has to be >= 1')
 
@@ -271,12 +281,11 @@ class RellisDataset(PointCloudDataset):
                         continue
 
                 # Path of points and labels
-                seq_path = join(self.path, 'sequences', self.sequences[s_ind])
-                velo_file = join(seq_path, 'velodyne', self.frames[s_ind][f_ind - f_inc] + '.bin')
+                velo_file = self.frames[s_ind]
                 if self.set == 'test':
                     label_file = None
                 else:
-                    label_file = join(seq_path, 'labels', self.frames[s_ind][f_ind - f_inc] + '.label')
+                    label_file = self.label_files[s_ind]
 
                 # Read points
                 frame_points = np.fromfile(velo_file, dtype=np.float32)
@@ -721,7 +730,7 @@ class RellisDataset(PointCloudDataset):
 
 
 class RellisSampler(Sampler):
-    """Sampler for SemanticKitti"""
+    """Sampler for Rellis"""
 
     def __init__(self, dataset: RellisDataset):
         Sampler.__init__(self, dataset)
@@ -1227,7 +1236,7 @@ class RellisSampler(Sampler):
 
 
 class RellisCustomBatch:
-    """Custom batch definition with memory pinning for SemanticKitti"""
+    """Custom batch definition with memory pinning for Rellis"""
 
     def __init__(self, input_list):
 
@@ -1367,8 +1376,8 @@ class RellisCustomBatch:
         return all_p_list
 
 
-def SemanticKittiCollate(batch_data):
-    return SemanticKittiCustomBatch(batch_data)
+def RellisCollate(batch_data):
+    return RellisCustomBatch(batch_data)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

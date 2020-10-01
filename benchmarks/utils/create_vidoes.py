@@ -82,18 +82,33 @@ if __name__ == "__main__":
     print(color_dict)
     mapper = SemLaserScan(sem_color_dict=color_dict, project=True, H=64, W=1024, fov_up=2.0,
                           fov_down=-24.33, max_classes=300, DA=False, flip_sign=False, drop_points=False)
-    w = imageio.get_writer(f'{args.sequence}.mp4', format='FFMPEG', mode='I', fps=10)
+    w = imageio.get_writer(f'{args.sequence}s.mp4', format='FFMPEG', mode='I', fps=10)
 
-    dataset_path = f'{args.path}/{args.sequence}/os1_cloud_node_kitti_bin'
+    dataset_path = f'{args.path}/{args.sequence}/velodyne'
 
     label_list = get_files_list(dataset_path)
     for scanfile in tqdm(label_list):
         mapper.open_scan(scanfile)
-        labelfile = scanfile.replace("os1_cloud_node_kitti_bin", "os1_cloud_node_semantickitti_label_id")
+        labelfile = scanfile.replace("velodyne", "labels")
         labelfile = labelfile.replace("bin", "label")
-        mapper.open_label(labelfile)
-        mapper.colorize()
-        proj_sem_color = mapper.proj_sem_color*255
-        w.append_data(proj_sem_color.astype(np.uint8))
+        label = np.fromfile(labelfile, dtype=np.int32)
+        label = label.reshape((-1))
+        unique, unique_counts = np.unique(label,return_counts = True)
+        # label_dict = {}
+        # for i in label:
+        #     if i in label_dict:
+        #         label_dict[i]=label_dict[i]+1
+        #     else:
+        #         label_dict[i] = 1
+        # print(label_dict)
+        count_sum = np.sum(unique_counts)
+
+        if unique_counts[0]>count_sum*0.5:
+            print(unique_counts,unique)
+            print(labelfile, unique)
+            mapper.open_label(labelfile)
+            mapper.colorize()
+            proj_sem_color = mapper.proj_sem_color*255
+            w.append_data(proj_sem_color.astype(np.uint8))
 
     w.close()
