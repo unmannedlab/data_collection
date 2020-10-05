@@ -49,6 +49,7 @@ def get_files_list(root_path, sequences, datafolder_name, extensions):
 
 
 label_dict = {0: "0_uknown",
+              1: "1_dirt",
               3: "3_grass",
               4: "4_tree",
               5: "5_pole",
@@ -72,6 +73,7 @@ label_dict = {0: "0_uknown",
               34: "34_rubble"}
 
 label_mapping = {0: 0,
+                 1: 0,
                  3: 1,
                  4: 2,
                  5: 3,
@@ -222,10 +224,14 @@ if __name__ == "__main__":
 
     rootpath = args.path
     seq = args.sequence
-    labellist = get_files_list(
-        rootpath, seq, "pylon_camera_node_label_id", [".png"])
-    imglist = get_files_list(
-        rootpath, seq, "pylon_camera_node", [".jpg"])
+
+    img_list = [line.strip().split() for line in open(rootpath+seq)]
+
+    labellist = []
+    imglist = []
+    for em in img_list:
+        imglist.append(em[0])
+        labellist.append(em[1])
     count_dict = count_label(labellist, args.num_workers)
     img_statics = compute_meanstd(imglist, args.num_workers)
     x = list(range(len(label_dict)))
