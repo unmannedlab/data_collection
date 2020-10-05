@@ -75,7 +75,7 @@ if __name__ == "__main__":
     labelfolder_name = args.dl_name
     data_ext = args.data_ext
     label_ext = args.label_ext
-    label_list = get_files_list(root_path,sequences,labelfolder_name,label_ext) 
+    img_list = [line.strip().split() for line in open(list_path)]
     datafilename = os.path.join(root_path,args.output_name)
     print(datafilename,data_ext,label_ext)
     path_len = len(root_path)
