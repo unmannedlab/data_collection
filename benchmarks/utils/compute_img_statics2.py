@@ -120,14 +120,13 @@ def read_img(img_label_path):
 
 def single_count(file_path):
     label = np.array(Image.open(file_path))
-    label = label[:, :, 0]
     unique, unique_counts = np.unique(label, return_counts=True)
     return {i: j for i, j in zip(unique, unique_counts)}
 
 
 def single_map(file_path):
     label = np.array(Image.open(file_path))
-    label = label[:, :, 0]
+    #label = label[:, :, 0]
     tmp = label.copy()
     for k,v in label_mapping.items():
         label[tmp==k] = v
@@ -217,7 +216,7 @@ def count_label(label_paths, num_workers):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", '-p')
-    parser.add_argument("--sequence", '-s', nargs='+')
+    parser.add_argument("--sequence", '-s')
     parser.add_argument("--num_workers", type=int)
     parser.add_argument("--name", type=str)
     args = parser.parse_args()
@@ -230,8 +229,10 @@ if __name__ == "__main__":
     labellist = []
     imglist = []
     for em in img_list:
-        imglist.append(em[0])
-        labellist.append(em[1])
+        #print(em)
+        imglist.append(os.path.join(rootpath,em[0]))
+        labellist.append(os.path.join(rootpath,em[1]))
+    #print(imglist[0],labellist[0])
     count_dict = count_label(labellist, args.num_workers)
     img_statics = compute_meanstd(imglist, args.num_workers)
     x = list(range(len(label_dict)))
