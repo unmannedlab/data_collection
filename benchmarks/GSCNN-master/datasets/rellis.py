@@ -66,8 +66,9 @@ class Rellis(data.Dataset):
         if len(self.files) == 0:
             raise RuntimeError('Found 0 images, please check the data set')
 
-        self.mean_std = ([0.496588, 0.59493099, 0.53358843], [0.496588, 0.59493099, 0.53358843])
+        self.mean_std = ([0.54218053, 0.64250553, 0.56620195], [0.54218052, 0.64250552, 0.56620194])
         self.label_mapping = {0: 0,
+                              1: 0,
                               3: 1,
                               4: 2,
                               5: 3,
@@ -79,15 +80,16 @@ class Rellis(data.Dataset):
                               12: 9,
                               15: 10,
                               17: 11,
-                              19: 12,
-                              23: 13,
-                              27: 14,
+                              18: 12,
+                              19: 13,
+                              23: 14,
+                              27: 15,
                               29: 1,
                               30: 1,
-                              31: 4,
+                              31: 16,
                               32: 4,
-                              33: 15,
-                              34: 16}
+                              33: 17,
+                              34: 18}
 
     def _eval_get_item(self, img, mask, scales, flip_bool):
         return_imgs = []
