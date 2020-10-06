@@ -19,10 +19,10 @@ import datasets.edge_utils as edge_utils
 
 trainid_to_name = cityscapes_labels.trainId2name
 id_to_trainid = cityscapes_labels.label2trainid
-num_classes = 17
+num_classes = 19
 ignore_label = 0
 root = cfg.DATASET.RELLIS_DIR
-list_paths = {'train':'train.lst','val':"val.lst",'test':'test.lst'}
+list_paths = {'train':'exp.lst','val':"exp.lst",'test':'test.lst'}
 
 
 palette = [128, 64, 128, 244, 35, 232, 70, 70, 70, 102, 102, 156, 190, 153, 153,
@@ -149,7 +149,7 @@ class Rellis(data.Dataset):
         img = Image.open(img_path).convert('RGB')
 
         mask = np.array(Image.open(label_path))
-        mask = mask[:, :, 0]
+        mask = mask[:, :]
         
 
         mask_copy = self.convert_label(mask)
