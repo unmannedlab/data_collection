@@ -65,10 +65,7 @@ label_dict = {0: "0_uknown",
               19: "19_bush",
               23: "23_concrete",
               27: "27_barrier",
-              29: "29_uphill",
-              30: "30_downhill",
               31: "31_puddle",
-              32: "32_deepwater",
               33: "33_mud",
               34: "34_rubble"}
 
@@ -89,10 +86,7 @@ label_mapping = {0: 0,
                  19: 13,
                  23: 14,
                  27: 15,
-                 29: 1,
-                 30: 1,
                  31: 16,
-                 32: 4,
                  33: 17,
                  34: 18}
 

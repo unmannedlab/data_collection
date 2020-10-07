@@ -2,6 +2,7 @@
 name: "rellis"
 labels:
   0: "void"
+  1: "dirt"
   3: "grass"
   4: "tree"
   5: "pole"
@@ -13,17 +14,16 @@ labels:
   12: "building"
   15: "log"
   17: "person"
+  18: "fence"
   19: "bush"
   23: "concrete"
   27: "barrier"
-  29: "grass"
-  30: "grass"
   31: "puddle"
-  32: "water"
   33: "mud"
   34: "rubble"
 color_map: # bgr
   0: [0,0,0]
+  1: [108, 64, 20]
   3: [0,102,0]
   4: [0,255,0]
   5: [0,153,153]
@@ -35,42 +35,40 @@ color_map: # bgr
   12: [255,0,0]
   15: [102,0,0]
   17: [204,153,255]
+  18: [102, 0, 204]
   19: [255,153,204]
   23: [170,170,170]
   27: [41,121,255]
-  29: [0,102,0]
-  30: [0,102,0]
   31: [134,255,239]
-  32: [0,128,255]
   33: [99,66,34]
   34: [110,22,138]
 content: # as a ratio with the total number of points
-  0: 1
-  3: 1
-  4: 1
-  5: 1
-  6: 1
-  7: 1
-  8: 1
-  9: 1
-  10: 1
-  12: 1
-  15: 1
-  17: 1
-  19: 1
-  23: 1
-  27: 1
-  29: 1
-  30: 1
-  31: 1
-  32: 1
-  33: 1
-  34: 1
+  0: 470326859
+  1: 0
+  3: 257874868
+  4: 106148934
+  5: 112
+  6: 224173
+  7: 0
+  8: 106356
+  9: 102
+  10: 479
+  12: 11
+  15: 36
+  17: 9985462
+  18: 1586071
+  19: 150735267
+  23: 12189274
+  27: 3508040
+  31: 1493276
+  33: 5777228
+  34: 2405052
 # classes that are indistinguishable from single scan or inconsistent in
 # ground truth are mapped to their closest equivalent
 learning_map:
   0: 0 #"void"
-  3: 1  #"grass"
+  1: 0 #"dirt"
+  3: 1 #"grass"
   4: 2 #"tree"
   5: 3 #"pole"
   6: 4 #"water"
@@ -81,21 +79,19 @@ learning_map:
   12: 9 #"building"
   15: 10 #"log"
   17: 11 #"person"
-  19: 12 #"bush"
-  23: 13 #"concrete"
-  27: 14 #"barrier"
-  29: 1 #"grass"
-  30: 1 #"grass"
-  31: 4 #"puddle"
-  32: 4 #"water"
-  33: 15 #"mud"
-  34: 16 #"rubble"
+  18: 12 #"fence"
+  19: 13 #"bush"
+  23: 14 #"concrete"
+  27: 15 #"barrier"
+  31: 16 #"puddle"
+  33: 17 #"mud"
+  34: 18 #"rubble"
 learning_map_inv: # inverse of previous map
-  0: 0 #"void"
-  1: 3  #"grass" 29: 1 #"grass" 30: 1 #"grass"
+  0: 0 #"void"#"dirt"
+  1: 3 #"grass"
   2: 4 #"tree"
   3: 5 #"pole"
-  4: 6 #"water" 31: 4 #"puddle" 32: 4 #"water"
+  4: 6 #"water"
   5: 7 #"sky"
   6: 8 #"vehicle"
   7: 9 #"object"
@@ -103,17 +99,19 @@ learning_map_inv: # inverse of previous map
   9: 12 #"building"
   10: 15 #"log"
   11: 17 #"person"
-  12: 19 #"bush"
-  13: 23 #"concrete"
-  14: 27 #"barrier"
-  15: 33 #"mud"
-  16: 34 #"rubble"
+  12: 18 #"fence"
+  13: 19 #"bush"
+  14: 23 #"concrete"
+  15: 27 #"barrier"
+  16: 31 #"puddle"
+  17: 33 #"mud"
+  18: 34 #"rubble"
 learning_ignore: # Ignore classes
-  0: True #"void"
-  1: False  #"grass" 29: 1 #"grass" 30: 1 #"grass"
+  0: True #"void"#"dirt"
+  1: False #"grass"
   2: False #"tree"
   3: False #"pole"
-  4: False #"water" 31: 4 #"puddle" 32: 4 #"water"
+  4: False #"water"
   5: False #"sky"
   6: False #"vehicle"
   7: False #"object"
@@ -121,11 +119,13 @@ learning_ignore: # Ignore classes
   9: False #"building"
   10: False #"log"
   11: False #"person"
-  12: False #"bush"
-  13: False #"concrete"
-  14: False #"barrier"
-  15: False #"mud"
-  16: False #"rubble"
+  12: False #"fence"
+  13: False #"bush"
+  14: False #"concrete"
+  15: False #"barrier"
+  16: False #"puddle"
+  17: False #"mud"
+  18: False #"rubble"
 split: # sequence numbers
   train: "pt_train.lst"
   valid: "pt_val.lst"
