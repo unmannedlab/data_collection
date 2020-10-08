@@ -758,8 +758,8 @@ class ModelTrainer:
 
                 # Save some of the frame pots
                 if f_ind % 20 == 0:
-                    seq_path = join(val_loader.dataset.path, 'sequences', val_loader.dataset.sequences[s_ind])
-                    velo_file = join(seq_path, 'velodyne', val_loader.dataset.frames[s_ind][f_ind] + '.bin')
+                    seq_path = join(val_loader.dataset.path, val_loader.dataset.sequences[s_ind])
+                    velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', val_loader.dataset.frames[s_ind][f_ind] + '.bin')
                     frame_points = np.fromfile(velo_file, dtype=np.float32)
                     frame_points = frame_points.reshape((-1, 4))
                     write_ply(filepath[:-4] + '_pots.ply',

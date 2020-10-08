@@ -55,7 +55,7 @@ class RellisConfig(Config):
     # Dataset name
     dataset = 'Rellis'
 
-    data_path = ""
+    data_path = "/media/maskjp/Datasets4/data_collection/20200213/trail_2/sequences"
 
     # Number of classes in the dataset (This value is overwritten by dataset class when Initializating dataset).
     num_classes = None
@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
     # Initialize datasets
     training_dataset = RellisDataset(config, set='training',
-                                            balance_classes=True)
+                                            balance_classes=False)
     test_dataset = RellisDataset(config, set='validation',
                                         balance_classes=False)
 

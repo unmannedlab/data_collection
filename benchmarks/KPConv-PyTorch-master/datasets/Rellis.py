@@ -62,7 +62,7 @@ class RellisDataset(PointCloudDataset):
         ##########################
 
         # Dataset folder
-        self.path = config.data_path#'../../Data/SemanticKitti'
+        self.path = config.data_path #'../../Data/SemanticKitti'
 
         # Type of task conducted on this dataset
         self.dataset_task = 'slam_segmentation'
@@ -72,30 +72,34 @@ class RellisDataset(PointCloudDataset):
 
         # Get a list of sequences
         if self.set == 'training':
-            self.sequences = 'pt_train.lst'
+            self.sequences_path = 'pt_train.lst'
         elif self.set == 'validation':
-            self.sequences = 'pt_val.lst'
+            self.sequences_path = 'pt_val.lst'
         elif self.set == 'test':
-            self.sequences = 'pt_test.lst'
+            self.sequences_path = 'pt_test.lst'
         else:
             raise ValueError('Unknown set for Rellis data: ', self.set)
 
         # List all files in each sequence
-        lst_path = join(self.path,self.sequences)
+        lst_path = join(self.path,self.sequences_path)
         self.file_list = [line.strip().split() for line in open(lst_path)]
-        self.frames = []
-        self.label_files = []
+
+        #self.label_files = [] 
 
         # fill in with names, checking that all sequences are complete
+        file_dict = {}
         for item in self.file_list:
             scan_path, label_path = item
-            scan_path = join(self.path, scan_path)
-            self.frames.append(scan_path)
-            self.label_files.append(label_path)
+            seq = scan_path[:5]
+            scan_name = scan_path[-10:-4]
+            if not seq in file_dict:
+                file_dict[seq] = []
+                file_dict[seq].append(scan_name)
+            else:
+                file_dict[seq].append(scan_name)
 
-        # sort for correspondance
-        self.frames.sort()
-        self.label_files.sort()
+        self.sequences = list(file_dict.keys())
+        self.frames = list(file_dict.values())
 
         ###########################
         # Object classes parameters
@@ -168,6 +172,7 @@ class RellisDataset(PointCloudDataset):
 
         # Initialize frame potentials
         self.potentials = torch.from_numpy(np.random.rand(self.all_inds.shape[0]) * 0.1 + 0.1)
+        #print(self.potentials.shape)
         self.potentials.share_memory_()
 
         # If true, the same amount of frames is picked per class
@@ -281,11 +286,12 @@ class RellisDataset(PointCloudDataset):
                         continue
 
                 # Path of points and labels
-                velo_file = self.frames[s_ind]
+                seq_path = join(self.path, self.sequences[s_ind])
+                velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind - f_inc] + '.bin')
                 if self.set == 'test':
                     label_file = None
                 else:
-                    label_file = self.label_files[s_ind]
+                    label_file = join(seq_path, 'os1_cloud_node_semantickitti_label_id', self.frames[s_ind][f_ind - f_inc] + '.label')
 
                 # Read points
                 frame_points = np.fromfile(velo_file, dtype=np.float32)
@@ -563,17 +569,18 @@ class RellisDataset(PointCloudDataset):
 
         for seq in self.sequences:
 
-            seq_folder = join(self.path, 'sequences', seq)
+            seq_folder = join(self.path, seq)
 
             # Read Calib
             self.calibrations.append(self.parse_calibration(join(seq_folder, "calib.txt")))
 
             # Read times
-            self.times.append(np.loadtxt(join(seq_folder, 'times.txt'), dtype=np.float32))
+            #self.times.append(np.loadtxt(join(seq_folder, 'times.txt'), dtype=np.float32))
 
             # Read poses
             poses_f64 = self.parse_poses(join(seq_folder, 'poses.txt'), self.calibrations[-1])
             self.poses.append([pose.astype(np.float32) for pose in poses_f64])
+
 
         ###################################
         # Prepare the indices of all frames
@@ -597,7 +604,7 @@ class RellisDataset(PointCloudDataset):
                 frame_mode = 'single'
                 if self.config.n_frames > 1:
                     frame_mode = 'multi'
-                seq_stat_file = join(self.path, 'sequences', seq, 'stats_{:s}.pkl'.format(frame_mode))
+                seq_stat_file = join(self.path, seq, 'stats_{:s}.pkl'.format(frame_mode))
 
                 # Check if inputs have already been computed
                 if exists(seq_stat_file):
@@ -617,13 +624,13 @@ class RellisDataset(PointCloudDataset):
                     seq_proportions = np.zeros((self.num_classes,), dtype=np.int32)
 
                     # Sequence path
-                    seq_path = join(self.path, 'sequences', seq)
+                    seq_path = join(self.path, seq)
 
                     # Read all frames
                     for f_ind, frame_name in enumerate(seq_frames):
 
                         # Path of points and labels
-                        label_file = join(seq_path, 'labels', frame_name + '.label')
+                        label_file = join(seq_path, 'os1_cloud_node_semantickitti_label_id', frame_name + '.label')
 
                         # Read labels
                         frame_labels = np.fromfile(label_file, dtype=np.int32)
@@ -644,8 +651,8 @@ class RellisDataset(PointCloudDataset):
                     with open(seq_stat_file, 'wb') as f:
                         pickle.dump([seq_class_frames, seq_proportions], f)
 
-                class_frames_bool = np.vstack((class_frames_bool, seq_class_frames))
-                self.class_proportions += seq_proportions
+            class_frames_bool = np.vstack((class_frames_bool, seq_class_frames))
+            self.class_proportions += seq_proportions
 
             # Transform boolean indexing to int indices.
             self.class_frames = []
@@ -768,19 +775,22 @@ class RellisSampler(Sampler):
             for i, c in enumerate(self.dataset.label_values):
                 if c not in self.dataset.ignored_labels:
 
-                    # Get the potentials of the frames containing this class
-                    class_potentials = self.dataset.potentials[self.dataset.class_frames[i]]
 
                     # Get the indices to generate thanks to potentials
                     used_classes = self.dataset.num_classes - len(self.dataset.ignored_labels)
                     class_n = num_centers // used_classes + 1
+
+                    # Get the potentials of the frames containing this class
+                    class_potentials = self.dataset.potentials[self.dataset.class_frames[i]]
+
                     if class_n < class_potentials.shape[0]:
                         _, class_indices = torch.topk(class_potentials, class_n, largest=False)
                     else:
                         class_indices = torch.zeros((0,), dtype=torch.int32)
-                        while class_indices.shape < class_n:
+                        while class_indices.shape[0] < class_n:
                             new_class_inds = torch.randperm(class_potentials.shape[0])
                             class_indices = torch.cat((class_indices, new_class_inds), dim=0)
+                            #print(class_potentials,class_indices.shape,class_indices,new_class_inds )
                         class_indices = class_indices[:class_n]
                     class_indices = self.dataset.class_frames[i][class_indices]
 
@@ -916,7 +926,7 @@ class RellisSampler(Sampler):
 
             for epoch in range(10):
                 for batch_i, batch in enumerate(dataloader):
-
+                    #print(batch_i)
                     # Control max_in_points value
                     all_lengths += batch.lengths[0].tolist()
 
