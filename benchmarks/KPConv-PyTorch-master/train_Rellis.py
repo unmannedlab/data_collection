@@ -55,7 +55,7 @@ class RellisConfig(Config):
     # Dataset name
     dataset = 'Rellis'
 
-    data_path = "/media/maskjp/Datasets4/data_collection/20200213/trail_2/sequences"
+    data_path = "/home/usl/Datasets/rellis"
 
     # Number of classes in the dataset (This value is overwritten by dataset class when Initializating dataset).
     num_classes = None
@@ -105,8 +105,8 @@ class RellisConfig(Config):
     max_val_points = 100000
 
     # Number of batch
-    batch_num = 8
-    val_batch_num = 8
+    batch_num = 30
+    val_batch_num = 14
 
     # Number of kernel points
     num_kernel_points = 15
@@ -162,13 +162,13 @@ class RellisConfig(Config):
     grad_clip_norm = 100.0
 
     # Number of steps per epochs
-    epoch_steps = 500
+    epoch_steps = 230
 
     # Number of validation examples per epoch
-    validation_size = 200
+    validation_size = 100
 
     # Number of epoch between each checkpoint
-    checkpoint_gap = 50
+    checkpoint_gap = 2
 
     # Augmentations
     augment_scale_anisotropic = True
@@ -211,7 +211,7 @@ if __name__ == '__main__':
     ############################
 
     # Set which gpu is going to be used
-    GPU_ID = '0'
+    GPU_ID = '0,1'
 
     # Set GPU visible device
     os.environ['CUDA_VISIBLE_DEVICES'] = GPU_ID
@@ -272,13 +272,13 @@ if __name__ == '__main__':
 
     # Initialize the dataloader
     training_loader = DataLoader(training_dataset,
-                                 batch_size=1,
+                                 batch_size=config.batch_num,
                                  sampler=training_sampler,
                                  collate_fn=RellisCollate,
                                  num_workers=config.input_threads,
                                  pin_memory=True)
     test_loader = DataLoader(test_dataset,
-                             batch_size=1,
+                             batch_size=config.val_batch_num,
                              sampler=test_sampler,
                              collate_fn=RellisCollate,
                              num_workers=config.input_threads,

@@ -92,7 +92,7 @@ class RellisDataset(PointCloudDataset):
             scan_path, label_path = item
             seq = scan_path[:5]
             scan_name = scan_path[-10:-4]
-            if not seq in file_dict:
+            if seq not in file_dict:
                 file_dict[seq] = []
                 file_dict[seq].append(scan_name)
             else:
@@ -172,6 +172,7 @@ class RellisDataset(PointCloudDataset):
 
         # Initialize frame potentials
         self.potentials = torch.from_numpy(np.random.rand(self.all_inds.shape[0]) * 0.1 + 0.1)
+        
         #print(self.potentials.shape)
         self.potentials.share_memory_()
 
@@ -199,7 +200,7 @@ class RellisDataset(PointCloudDataset):
         self.epoch_i.share_memory_()
         self.epoch_inds.share_memory_()
         self.epoch_labels.share_memory_()
-
+        print(self.set,self.all_inds.shape,self.potentials.shape,self.epoch_inds.shape)
         self.worker_waiting = torch.tensor([0 for _ in range(config.input_threads)], dtype=torch.int32)
         self.worker_waiting.share_memory_()
         self.worker_lock = Lock()
@@ -594,8 +595,7 @@ class RellisDataset(PointCloudDataset):
         # For each class list the frames containing them
         ################################################
 
-        if self.set in ['training', 'validation']:
-
+        if self.set == 'training':
             class_frames_bool = np.zeros((0, self.num_classes), dtype=np.bool)
             self.class_proportions = np.zeros((self.num_classes,), dtype=np.int32)
 
@@ -604,7 +604,7 @@ class RellisDataset(PointCloudDataset):
                 frame_mode = 'single'
                 if self.config.n_frames > 1:
                     frame_mode = 'multi'
-                seq_stat_file = join(self.path, seq, 'stats_{:s}.pkl'.format(frame_mode))
+                seq_stat_file = join(self.path, seq, 'stats_{:s}_{:s}.pkl'.format(frame_mode,self.set))
 
                 # Check if inputs have already been computed
                 if exists(seq_stat_file):
@@ -665,6 +665,73 @@ class RellisDataset(PointCloudDataset):
 
         # Add variables for validation
         if self.set == 'validation':
+            class_frames_bool = np.zeros((0, self.num_classes), dtype=np.bool)
+            self.class_proportions = np.zeros((self.num_classes,), dtype=np.int32)
+
+            for s_ind, (seq, seq_frames) in enumerate(zip(self.sequences, self.frames)):
+
+                frame_mode = 'single'
+                if self.config.n_frames > 1:
+                    frame_mode = 'multi'
+                seq_stat_file = join(self.path, seq, 'stats_{:s}_{:s}.pkl'.format(frame_mode,self.set))
+
+                # Check if inputs have already been computed
+                if exists(seq_stat_file):
+                    # Read pkl
+                    with open(seq_stat_file, 'rb') as f:
+                        seq_class_frames, seq_proportions = pickle.load(f)
+
+                else:
+
+                    # Initiate dict
+                    print('Preparing seq {:s} class frames. (Long but one time only)'.format(seq))
+
+                    # Class frames as a boolean mask
+                    seq_class_frames = np.zeros((len(seq_frames), self.num_classes), dtype=np.bool)
+
+                    # Proportion of each class
+                    seq_proportions = np.zeros((self.num_classes,), dtype=np.int32)
+
+                    # Sequence path
+                    seq_path = join(self.path, seq)
+
+                    # Read all frames
+                    for f_ind, frame_name in enumerate(seq_frames):
+
+                        # Path of points and labels
+                        label_file = join(seq_path, 'os1_cloud_node_semantickitti_label_id', frame_name + '.label')
+
+                        # Read labels
+                        frame_labels = np.fromfile(label_file, dtype=np.int32)
+                        sem_labels = frame_labels & 0xFFFF  # semantic label in lower half
+                        sem_labels = self.learning_map[sem_labels]
+
+                        # Get present labels and there frequency
+                        unique, counts = np.unique(sem_labels, return_counts=True)
+
+                        # Add this frame to the frame lists of all class present
+                        frame_labels = np.array([self.label_to_idx[l] for l in unique], dtype=np.int32)
+                        seq_class_frames[f_ind, frame_labels] = True
+
+                        # Add proportions
+                        seq_proportions[frame_labels] += counts
+
+                    # Save pickle
+                    with open(seq_stat_file, 'wb') as f:
+                        pickle.dump([seq_class_frames, seq_proportions], f)
+
+            class_frames_bool = np.vstack((class_frames_bool, seq_class_frames))
+            self.class_proportions += seq_proportions
+
+            # Transform boolean indexing to int indices.
+            self.class_frames = []
+            for i, c in enumerate(self.label_values):
+                if c in self.ignored_labels:
+                    self.class_frames.append(torch.zeros((0,), dtype=torch.int64))
+                else:
+                    integer_inds = np.where(class_frames_bool[:, i])[0]
+                    self.class_frames.append(torch.from_numpy(integer_inds.astype(np.int64)))
+
             self.val_points = []
             self.val_labels = []
             self.val_confs = []
@@ -840,7 +907,8 @@ class RellisSampler(Sampler):
             self.dataset.potentials[gen_indices] = torch.ceil(self.dataset.potentials[gen_indices])
             self.dataset.potentials[gen_indices] += torch.from_numpy(np.random.rand(gen_indices.shape[0]) * 0.1 + 0.1)
 
-            # Update epoch inds
+            # Update epoch 
+            #print(self.dataset.epoch_inds.shape, gen_indices.shape,self.dataset.potentials.shape)
             self.dataset.epoch_inds += gen_indices
 
         # Generator loop
