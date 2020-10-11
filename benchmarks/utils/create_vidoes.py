@@ -4,6 +4,7 @@ import os
 import yaml
 import random
 from tqdm import tqdm
+from skimage import color
 import argparse
 import matplotlib.pyplot as plt
 from benchmarks.SalsaNext.train.common.laserscan import SemLaserScan
@@ -84,31 +85,58 @@ if __name__ == "__main__":
                           fov_down=-24.33, max_classes=300, DA=False, flip_sign=False, drop_points=False)
     w = imageio.get_writer(f'{args.sequence}s.mp4', format='FFMPEG', mode='I', fps=10)
 
-    dataset_path = f'{args.path}/{args.sequence}/velodyne'
+    dataset_path = f'{args.path}/{args.sequence}/os1_cloud_node_kitti_bin'
 
     label_list = get_files_list(dataset_path)
+    max_num = 100
+    count = 0
     for scanfile in tqdm(label_list):
         mapper.open_scan(scanfile)
-        labelfile = scanfile.replace("velodyne", "labels")
+        labelfile = scanfile.replace("os1_cloud_node_kitti_bin", "os1_cloud_node_semantickitti_label_id")
         labelfile = labelfile.replace("bin", "label")
         label = np.fromfile(labelfile, dtype=np.int32)
         label = label.reshape((-1))
         unique, unique_counts = np.unique(label,return_counts = True)
-        # label_dict = {}
-        # for i in label:
-        #     if i in label_dict:
-        #         label_dict[i]=label_dict[i]+1
-        #     else:
-        #         label_dict[i] = 1
-        # print(label_dict)
+        label_dict = {}
+        for i in label:
+            if i in label_dict:
+                label_dict[i]=label_dict[i]+1
+            else:
+                label_dict[i] = 1
+        #print(label_dict)
         count_sum = np.sum(unique_counts)
 
-        if unique_counts[0]>count_sum*0.5:
-            print(unique_counts,unique)
-            print(labelfile, unique)
-            mapper.open_label(labelfile)
-            mapper.colorize()
-            proj_sem_color = mapper.proj_sem_color*255
-            w.append_data(proj_sem_color.astype(np.uint8))
+        # if unique_counts[0]>count_sum*0.5:
+        #     print(unique_counts,unique)
+        #     print(labelfile, unique)
+        #proj_range = (mapper.proj_remission-mapper.proj_remission.min())/(mapper.proj_remission.max()-mapper.proj_remission.min())*255
+        proj_range = (mapper.proj_range+1)/2*255
+        #proj_range = (mapper.proj_range+1)/2*255
+        #print(proj_range.shape,proj_range.min(),proj_range.max())
+        #red_multiplier = [1, 0, 0]
+
+
+        proj_range = color.gray2rgb(proj_range,None)
+        #proj_range = proj_range* red_multiplier
+        proj_range[:,:,0] = proj_range[:,:,0] * 0.2989
+        proj_range[:,:,1] = proj_range[:,:,1] * 0.5870
+        proj_range[:,:,2] = proj_range[:,:,2] * 0.1140
+        proj_range = proj_range.astype(np.uint8)
+        #print(proj_range.shape,proj_range.min(),proj_range.max())
+        #print(proj_range.shape,proj_range.min(),proj_range.max())
+        #proj_range = np.stack((proj_range,proj_range,proj_range),axis=2)
+
+
+        #proj_range = proj_range * 255
+        mapper.open_label(labelfile)
+        mapper.colorize()
+        proj_sem_color = mapper.proj_sem_color*255
+        #print(proj_range.shape,proj_sem_color.shape)
+        cat_img = np.concatenate((proj_range,proj_sem_color),axis=0).astype(np.uint8)
+        w.append_data(cat_img)
+        # if count == max_num:
+        #     break
+        # else:
+        #     count=count+1
 
     w.close()

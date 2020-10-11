@@ -54,13 +54,13 @@ def single_count(file_path):
     #label = label & 0xFFFF
     unique, unique_counts = np.unique(label,return_counts = True)
     #print(unique,unique_counts)
-    pt_path = file_path.replace("labels","velodyne")
-    pt_path = pt_path.replace("label","bin")
-    scan = np.fromfile(pt_path, dtype=np.float32)
-    scan = scan.reshape((-1, 4))
-    xyz = scan[label==0]
-    xyz = xyz[:,:3]
-    xyz_dist = lg.norm(xyz,axis=1)
+    # pt_path = file_path.replace("labels","velodyne")
+    # pt_path = pt_path.replace("label","bin")
+    # scan = np.fromfile(pt_path, dtype=np.float32)
+    # scan = scan.reshape((-1, 4))
+    # xyz = scan[label==0]
+    # xyz = xyz[:,:3]
+    # xyz_dist = lg.norm(xyz,axis=1)
     #print(np.histogram(xyz_dist))
     #print(len(xyz_dist),xyz_dist.min(),xyz_dist.max())
     count_sum = np.sum(unique_counts)
@@ -109,8 +109,9 @@ if __name__ == "__main__":
     label_ext = args.label_ext
     label_list = []
     for em in img_list:
-        t = em[1].replace("os1_cloud_node_semantickitti_label_id","labels")
+        t = em[1]#.replace("os1_cloud_node_semantickitti_label_id","os1_cloud_node_semantickitti_label_id")
         label_list.append(os.path.join(root_path,t))
+    #print(label_list)
     count_dict = count_label(label_list,7)
     with open(f"{args.save_name}.pkl",'wb') as f:
         pickle.dump(count_dict,f)
