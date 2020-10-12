@@ -100,18 +100,29 @@ def setup_loaders(args):
                                               target_transform=target_transform,
                                               cv_split=args.cv)
     elif args.dataset == 'rellis':
-        city_mode = 'train' 
-        train_set = args.dataset_cls.Rellis(
-            city_mode, 
-            joint_transform=train_joint_transform,
-            transform=train_input_transform,
-            target_transform=target_train_transform,
-            dump_images=args.dump_augmentation_images,
-            cv_split=args.cv)
-        val_set = args.dataset_cls.Rellis('val',
-                                              transform=val_input_transform,
-                                              target_transform=target_transform,
-                                              cv_split=args.cv)
+        if not args.test_mode:
+            city_mode = 'train' 
+            train_set = args.dataset_cls.Rellis(
+                city_mode, 
+                joint_transform=train_joint_transform,
+                transform=train_input_transform,
+                target_transform=target_train_transform,
+                dump_images=args.dump_augmentation_images,
+                cv_split=args.cv)
+            val_set = args.dataset_cls.Rellis('val',
+                                                transform=val_input_transform,
+                                                target_transform=target_transform,
+                                                cv_split=args.cv)
+        else:
+            city_mode = 'test' 
+            train_set = args.dataset_cls.Rellis('test',
+                                                transform=val_input_transform,
+                                                target_transform=target_transform,
+                                                cv_split=args.cv)  
+            val_set = args.dataset_cls.Rellis('test',
+                                                transform=val_input_transform,
+                                                target_transform=target_transform,
+                                                cv_split=args.cv)            
     else:
         raise
     

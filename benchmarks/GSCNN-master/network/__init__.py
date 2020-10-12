@@ -16,6 +16,9 @@ def get_net(args, criterion):
     #net = net
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     net = torch.nn.DataParallel(net).to(device)
+    if args.checkpoint_path:
+        print(f"Loading state_dict from {args.checkpoint_path}")
+        net.load_state_dict(args.checkpoint_path)
     return net
 
 

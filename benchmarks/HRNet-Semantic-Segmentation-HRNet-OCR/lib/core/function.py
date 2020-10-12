@@ -216,21 +216,33 @@ def test(config, test_dataset, testloader, model,
         for _, batch in enumerate(tqdm(testloader)):
             image, size, name = batch
             size = size[0]
-            pred = test_dataset.multi_scale_inference(
-                config,
-                model,
-                image,
-                scales=config.TEST.SCALE_LIST,
-                flip=config.TEST.FLIP_TEST)
+            pred = model(image)
+            pred_np = pred.cpu().numpy()
 
-            if pred.size()[-2] != size[0] or pred.size()[-1] != size[1]:
-                pred = F.interpolate(
-                    pred, size[-2:],
-                    mode='bilinear', align_corners=config.MODEL.ALIGN_CORNERS
-                )
-
-            if sv_pred:
-                sv_path = os.path.join(sv_dir, 'test_results')
+            b,_,_,_ = pred.shape
+            for i in range(b):
+                sv_path = os.path.join(sv_dir, 'hrnet','seg',name[i][:5])
                 if not os.path.exists(sv_path):
                     os.mkdir(sv_path)
-                test_dataset.save_pred(pred, sv_path, name)
+                _, file_name = os.path.split(name)
+                file_name = file_name.replace("jpg","npy")
+                data_path = os.path.join(sv_path,file_name)
+                np.save(data_path,pred_np[i])
+            # pred = test_dataset.multi_scale_inference(
+            #     config,
+            #     model,
+            #     image,
+            #     scales=config.TEST.SCALE_LIST,
+            #     flip=config.TEST.FLIP_TEST)
+
+            # if pred.size()[-2] != size[0] or pred.size()[-1] != size[1]:
+            #     pred = F.interpolate(
+            #         pred, size[-2:],
+            #         mode='bilinear', align_corners=config.MODEL.ALIGN_CORNERS
+            #     )
+
+            # if sv_pred:
+            #     sv_path = os.path.join(sv_dir, 'test_results')
+            #     if not os.path.exists(sv_path):
+            #         os.mkdir(sv_path)
+            #     test_dataset.save_pred(pred, sv_path, name)
