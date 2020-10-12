@@ -217,7 +217,7 @@ def test(config, test_dataset, testloader, model,
             image, size, name = batch
             size = size[0]
             pred = model(image)
-
+            pred_np = pred.cpu().numpy()
 
             b,_,_,_ = pred.shape
             for i in range(b):
@@ -227,7 +227,7 @@ def test(config, test_dataset, testloader, model,
                 _, file_name = os.path.split(name)
                 file_name = file_name.replace("jpg","npy")
                 data_path = os.path.join(sv_path,file_name)
-                np.save(data_path)
+                np.save(data_path,pred_np[i])
             # pred = test_dataset.multi_scale_inference(
             #     config,
             #     model,
