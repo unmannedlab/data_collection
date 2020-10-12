@@ -109,24 +109,24 @@ class Rellis(data.Dataset):
         
     def read_files(self):
         files = []
-        if 'test' in self.mode:
-            for item in self.img_list:
-                image_path = item
-                name = os.path.splitext(os.path.basename(image_path[0]))[0]
-                files.append({
-                    "img": image_path[0],
-                    "name": name,
-                })
-        else:
-            for item in self.img_list:
-                image_path, label_path = item
-                name = os.path.splitext(os.path.basename(label_path))[0]
-                files.append({
-                    "img": image_path,
-                    "label": label_path,
-                    "name": name,
-                    "weight": 1
-                })
+        # if 'test' in self.mode:
+        #     for item in self.img_list:
+        #         image_path = item
+        #         name = os.path.splitext(os.path.basename(image_path[0]))[0]
+        #         files.append({
+        #             "img": image_path[0],
+        #             "name": name,
+        #         })
+        # else:
+        for item in self.img_list:
+            image_path, label_path = item
+            name = os.path.splitext(os.path.basename(label_path))[0]
+            files.append({
+                "img": image_path,
+                "label": label_path,
+                "name": name,
+                "weight": 1
+            })
         return files
 
     def convert_label(self, label, inverse=False):
@@ -156,6 +156,8 @@ class Rellis(data.Dataset):
 
         if self.eval_mode:
             return self._eval_get_item(img, mask_copy, self.eval_scales, self.eval_flip), img_name
+        if self.mode == 'test':
+            return img, mask, img_name, item['img']
 
         mask = Image.fromarray(mask_copy.astype(np.uint8))
         # Image Transformations
