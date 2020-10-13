@@ -553,6 +553,7 @@ class RellisDataset(PointCloudDataset):
             ti += 1
             print('\n************************\n')
 
+
         return [self.config.num_layers] + input_list
 
     def load_calib_poses(self):

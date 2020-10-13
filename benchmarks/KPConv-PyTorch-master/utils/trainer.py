@@ -165,7 +165,7 @@ class ModelTrainer:
 
             self.step = 0
             for batch in training_loader:
-
+                print(batch)
                 # Check kill signal (running_PID.txt deleted)
                 if config.saving and not exists(PID_file):
                     continue

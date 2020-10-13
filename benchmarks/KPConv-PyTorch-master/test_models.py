@@ -32,6 +32,7 @@ import torch
 from datasets.ModelNet40 import *
 from datasets.S3DIS import *
 from datasets.SemanticKitti import *
+from datasets.Rellis import *
 from torch.utils.data import DataLoader
 
 from utils.config import Config
@@ -174,6 +175,10 @@ if __name__ == '__main__':
         test_dataset = SemanticKittiDataset(config, set=set, balance_classes=False)
         test_sampler = SemanticKittiSampler(test_dataset)
         collate_fn = SemanticKittiCollate
+    elif config.dataset == 'Rellis':
+        test_dataset = RellisDataset(config, set=set, balance_classes=False)
+        test_sampler = RellisSampler(test_dataset)
+        collate_fn = RellisCollate
     else:
         raise ValueError('Unsupported dataset : ' + config.dataset)
 
@@ -214,5 +219,7 @@ if __name__ == '__main__':
         tester.cloud_segmentation_test(net, test_loader, config)
     elif config.dataset_task == 'slam_segmentation':
         tester.slam_segmentation_test(net, test_loader, config)
+    elif config.dataset_task == "rellis_segmentation":
+        tester.rellis_segmentation_test(net, test_loader, config)
     else:
         raise ValueError('Unsupported dataset_task for testing: ' + config.dataset_task)
