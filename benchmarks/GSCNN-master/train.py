@@ -22,6 +22,8 @@ import datasets
 import loss
 import network
 import optimizer
+from tqdm import tqdm
+from PIL import Image
 
 # Argument Parser
 parser = argparse.ArgumentParser(description='GSCNN')
@@ -103,6 +105,7 @@ parser.add_argument('--test_mode', action='store_true', default=False,
                     help='minimum testing (1 epoch run ) to verify nothing failed')
 parser.add_argument('--mode',type=str,default="train")                    
 parser.add_argument('--test_sv_path', type=str, default="")
+parser.add_argument('--checkpoint_path',type=str,default="")
 parser.add_argument('-wb', '--wt_bound', type=float, default=1.0)
 parser.add_argument('--maxSkip', type=int, default=0)
 args = parser.parse_args()
@@ -140,14 +143,14 @@ def main():
         test_sv_path = args.test_sv_path
         print(f"Saving prediction {test_sv_path}")
         net.eval()
-        for vi, data in enumerate(val_loader):
+        for vi, data in enumerate(tqdm(val_loader)):
             input, mask, img_name, img_path = data
             assert len(input.size()) == 4 and len(mask.size()) == 3
             assert input.size()[2:] == mask.size()[1:]
             b, h, w = mask.size()
 
             batch_pixel_size = input.size(0) * input.size(2) * input.size(3)
-            input, mask_cuda, edge_cuda = input.cuda(), mask.cuda(), edge.cuda()
+            input, mask_cuda = input.cuda(), mask.cuda()
 
             with torch.no_grad():
                 seg_out, edge_out = net(input)    # output = (1, 19, 713, 713)
@@ -155,12 +158,26 @@ def main():
             seg_predictions = seg_out.data.cpu().numpy()
             edge_predictions = edge_out.cpu().numpy()
             for i in range(b):
-                seg_path = os.path.join(test_sv_path,"gscnn","seg",img_path[i])
-                edge_path = os.path.join(test_sv_path,"gscnn","edge",img_path[i])
-                seg_path.replace("jpg","npy")
-                edge_path.replace("jpg","npy")
-                np.save(seg_path,seg_predictions[i])
-                np.save(edge_path,edge_predictions[i])
+                _,file_name = os.path.split(img_path[i])
+                file_name = file_name.replace("jpg","png")
+                seq = img_path[i][:5]
+                seg_path = os.path.join(test_sv_path,"gscnn","seg",seq)
+                if not os.path.exists(seg_path):
+                    os.makedirs(seg_path)
+                edge_path = os.path.join(test_sv_path,"gscnn","edge",seq)
+                if not os.path.exists(edge_path):
+                    os.makedirs(edge_path)
+                seg_arg = np.argmax(seg_predictions[i],axis=0).astype(np.uint8)
+                edge_arg = np.argmax(edge_predictions[i],axis=0).astype(np.uint8)
+
+                seg_img = np.stack((seg_arg,seg_arg,seg_arg),axis=2)
+                edge_img = np.stack((edge_arg,edge_arg,edge_arg),axis=2)
+                seg_img = Image.fromarray(seg_img)
+                seg_img.save(os.path.join(seg_path,file_name))
+                edge_img = Image.fromarray(edge_img)
+                edge_img.save(os.path.join(edge_path,file_name))
+
+        return
 
 
 

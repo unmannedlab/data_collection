@@ -18,7 +18,7 @@ def get_net(args, criterion):
     net = torch.nn.DataParallel(net).to(device)
     if args.checkpoint_path:
         print(f"Loading state_dict from {args.checkpoint_path}")
-        net.load_state_dict(args.checkpoint_path)
+        net.load_state_dict(torch.load(args.checkpoint_path)["state_dict"])
     return net
 
 

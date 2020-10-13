@@ -100,7 +100,7 @@ def setup_loaders(args):
                                               target_transform=target_transform,
                                               cv_split=args.cv)
     elif args.dataset == 'rellis':
-        if not args.test_mode:
+        if  args.mode != "test":
             city_mode = 'train' 
             train_set = args.dataset_cls.Rellis(
                 city_mode, 

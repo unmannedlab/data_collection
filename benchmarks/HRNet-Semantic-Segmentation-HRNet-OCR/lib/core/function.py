@@ -21,6 +21,7 @@ from utils.utils import get_confusion_matrix
 from utils.utils import adjust_learning_rate
 
 import utils.distributed as dist
+from PIL import Image
 
 
 def reduce_tensor(inp):
@@ -138,6 +139,7 @@ def validate(config, testloader, model, writer_dict):
         res = confusion_matrix[..., i].sum(0)
         tp = np.diag(confusion_matrix[..., i])
         IoU_array = (tp / np.maximum(1.0, pos + res - tp))
+        print(IoU_array)
         mean_IoU = IoU_array.mean()
         if dist.get_rank() <= 0:
             logging.info('{} {} {}'.format(i, IoU_array, mean_IoU))
@@ -217,17 +219,22 @@ def test(config, test_dataset, testloader, model,
             image, size, name = batch
             size = size[0]
             pred = model(image)
+            pred = pred[config.TEST.OUTPUT_INDEX]
             pred_np = pred.cpu().numpy()
 
             b,_,_,_ = pred.shape
             for i in range(b):
-                sv_path = os.path.join(sv_dir, 'hrnet','seg',name[i][:5])
+                sv_path = os.path.join(config.OUTPUT_DIR, 'hrnet',name[i][:5],'pylon_camera_node_label_id')
                 if not os.path.exists(sv_path):
-                    os.mkdir(sv_path)
-                _, file_name = os.path.split(name)
-                file_name = file_name.replace("jpg","npy")
+                    os.makedirs(sv_path)
+                _, file_name = os.path.split(name[i])
+                file_name = file_name.replace("jpg","png")
                 data_path = os.path.join(sv_path,file_name)
-                np.save(data_path,pred_np[i])
+                pred_arg = np.argmax(pred_np[i],axis=0).astype(np.uint8)
+                pred_img = np.stack((pred_arg,pred_arg,pred_arg),axis=2)
+                pred_img = Image.fromarray(pred_img)
+                pred_img.save(data_path)
+                #np.save(data_path,pred_arg)
             # pred = test_dataset.multi_scale_inference(
             #     config,
             #     model,
