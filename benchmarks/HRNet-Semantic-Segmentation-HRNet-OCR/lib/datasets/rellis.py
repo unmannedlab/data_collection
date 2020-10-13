@@ -122,7 +122,7 @@ class Rellis(BaseDataset):
             image = self.input_transform(image)
             image = image.transpose((2, 0, 1))
 
-            return image.copy(), np.array(size), name
+            return image.copy(), np.array(size), item["img"]
 
         label = np.array(Image.open(os.path.join(self.root, item["label"])))
         label = label[:, :]

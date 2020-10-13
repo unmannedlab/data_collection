@@ -156,8 +156,7 @@ class Rellis(data.Dataset):
 
         if self.eval_mode:
             return self._eval_get_item(img, mask_copy, self.eval_scales, self.eval_flip), img_name
-        if self.mode == 'test':
-            return img, mask, img_name, item['img']
+
 
         mask = Image.fromarray(mask_copy.astype(np.uint8))
         # Image Transformations
@@ -167,6 +166,8 @@ class Rellis(data.Dataset):
             img = self.transform(img)
         if self.target_transform is not None:
             mask = self.target_transform(mask)
+        if self.mode == 'test':
+            return img, mask, img_name, item['img']
 
         _edgemap = mask.numpy()
         _edgemap = edge_utils.mask_to_onehot(_edgemap, num_classes)
