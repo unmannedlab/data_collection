@@ -200,7 +200,6 @@ class RellisDataset(PointCloudDataset):
         self.epoch_i.share_memory_()
         self.epoch_inds.share_memory_()
         self.epoch_labels.share_memory_()
-        print(self.set,self.all_inds.shape,self.potentials.shape,self.epoch_inds.shape)
         self.worker_waiting = torch.tensor([0 for _ in range(config.input_threads)], dtype=torch.int32)
         self.worker_waiting.share_memory_()
         self.worker_lock = Lock()
@@ -289,23 +288,23 @@ class RellisDataset(PointCloudDataset):
                 # Path of points and labels
                 seq_path = join(self.path, self.sequences[s_ind])
                 velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind - f_inc] + '.bin')
-                if self.set == 'test':
-                    label_file = None
-                else:
-                    label_file = join(seq_path, 'os1_cloud_node_semantickitti_label_id', self.frames[s_ind][f_ind - f_inc] + '.label')
+                # if self.set == 'test':
+                #     label_file = None
+                # else:
+                label_file = join(seq_path, 'os1_cloud_node_semantickitti_label_id', self.frames[s_ind][f_ind - f_inc] + '.label')
 
                 # Read points
                 frame_points = np.fromfile(velo_file, dtype=np.float32)
                 points = frame_points.reshape((-1, 4))
 
-                if self.set == 'test':
-                    # Fake labels
-                    sem_labels = np.zeros((frame_points.shape[0],), dtype=np.int32)
-                else:
+                # if self.set == 'test':
+                #     # Fake labels
+                #     sem_labels = np.zeros((frame_points.shape[0],), dtype=np.int32)
+                # else:
                     # Read labels
-                    frame_labels = np.fromfile(label_file, dtype=np.int32)
-                    sem_labels = frame_labels & 0xFFFF  # semantic label in lower half
-                    sem_labels = self.learning_map[sem_labels]
+                frame_labels = np.fromfile(label_file, dtype=np.int32)
+                sem_labels = frame_labels & 0xFFFF  # semantic label in lower half
+                sem_labels = self.learning_map[sem_labels]
 
                 # Apply pose (without np.dot to avoid multi-threading)
                 hpoints = np.hstack((points[:, :3], np.ones_like(points[:, :1])))

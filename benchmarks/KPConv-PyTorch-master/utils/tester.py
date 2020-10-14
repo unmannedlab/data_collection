@@ -801,7 +801,7 @@ class ModelTester:
             if not exists(report_path):
                 makedirs(report_path)
 
-        if test_loader.dataset.set == 'validation':
+        if test_loader.dataset.set == ['validation','test']:
             for folder in ['val_predictions', 'val_probs']:
                 if not exists(join(test_path, folder)):
                     makedirs(join(test_path, folder))
@@ -813,7 +813,7 @@ class ModelTester:
         # Init validation container
         all_f_preds = []
         all_f_labels = []
-        if test_loader.dataset.set == 'validation':
+        if test_loader.dataset.set in ['validation','test']:
             for i, seq_frames in enumerate(test_loader.dataset.frames):
                 all_f_preds.append([np.zeros((0,), dtype=np.int32) for _ in seq_frames])
                 all_f_labels.append([np.zeros((0,), dtype=np.int32) for _ in seq_frames])
@@ -881,7 +881,7 @@ class ModelTester:
 
                     # Save probs in a binary file (uint8 format for lighter weight)
                     seq_name = test_loader.dataset.sequences[s_ind]
-                    if test_loader.dataset.set == 'validation':
+                    if test_loader.dataset.set in ['validation','test']:
                         folder = 'val_probs'
                         pred_folder = 'val_predictions'
                     else:
@@ -899,7 +899,7 @@ class ModelTester:
                     np.save(filepath, frame_probs_uint8)
 
                     # Save some prediction in ply format for visual
-                    if test_loader.dataset.set == 'validation':
+                    if test_loader.dataset.set in ['validation','test']:
 
                         # Insert false columns for ignored labels
                         frame_probs_uint8_bis = frame_probs_uint8.copy()
@@ -1005,7 +1005,7 @@ class ModelTester:
                 # Update last_min
                 last_min += 1
 
-                if test_loader.dataset.set == 'validation' and last_min % 1 == 0:
+                if test_loader.dataset.set in ['validation','test'] and last_min % 1 == 0:
 
                     #####################################
                     # Results on the whole validation set
@@ -1026,6 +1026,14 @@ class ModelTester:
                     val_labels = []
                     t1 = time.time()
                     for i, seq_frames in enumerate(test_loader.dataset.frames):
+                        seq = test_loader.dataset.sequences[i]
+                        seq_folder = os.path.join(config.sv_path,'kpconv',seq,"os1_cloud_node_semantickitti_label_id")
+                        if os.path.exists(seq_folder):
+                            os.makedirs(seq_folder)
+                        for j, frame in enumerate(seq_frames):
+                            frame_path = os.path.join(seq_folder,frame+'.label')
+                            all_f_preds[i][j].tofile(frame_path)
+
                         val_preds += [np.hstack(all_f_preds[i])]
                         val_labels += [np.hstack(all_f_labels[i])]
                     val_preds = np.hstack(val_preds)
