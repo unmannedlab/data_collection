@@ -2,3 +2,4 @@
 .idea
 train/tasks/semantic/logs
 train/__pycache__
+__pycache__/*

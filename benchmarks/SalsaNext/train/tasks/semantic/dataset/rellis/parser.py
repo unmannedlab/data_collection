@@ -316,8 +316,8 @@ class Parser():
                                     learning_map_inv=self.learning_map_inv,
                                     sensor=self.sensor,
                                     max_points=max_points,
-                                    transform=True,
                                     gt=self.gt)
+                                   #transform=True,
 
         self.trainloader = torch.utils.data.DataLoader(self.train_dataset,
                                                        batch_size=self.batch_size,

@@ -76,20 +76,20 @@ def hex2rgb(s):
 color_dict = {i[0]: hex2rgb(i[1]) for i in color_dict.items()}
 
 if __name__ == "__main__":
-    filename = "pt_test"
+    filename = "pt_train"
     root_path = "/home/usl/Datasets/rellis"
-    list_path = f"/home/usl/Datasets/rellis/split/{filename}.lst"
-    mapper = SemLaserScan(sem_color_dict=color_dict, project=True, H=64, W=1024, fov_up=2.0,
-                          fov_down=-24.33, max_classes=300, DA=False, flip_sign=False, drop_points=False)
-    w = imageio.get_writer(f'{args.sequence}s.mp4', format='FFMPEG', mode='I', fps=10)
+    list_path = f"/home/usl/Datasets/rellis/{filename}.lst"
+    mapper = SemLaserScan(sem_color_dict=color_dict, project=True, H=64, W=1024, fov_up=22.5,
+                          fov_down=-22.5, max_classes=300, DA=False, flip_sign=False, drop_points=False)
+    w = imageio.get_writer(f'{filename}s.mp4', format='FFMPEG', mode='I', fps=10)
 
-    dataset_path = f'{args.path}/{args.sequence}/os1_cloud_node_kitti_bin'
     label_list = [line.strip().split() for line in open(list_path)]
     #img_list = get_files_list(dataset_path)
     max_num = 100
     count = 0
     for scanfile in tqdm(label_list):
-        scanfile = os.path.join(args.path,scanfile[0])
+        #print(scanfile)
+        scanfile = os.path.join(root_path,scanfile[0])
         mapper.open_scan(scanfile)
         labelfile = scanfile.replace("os1_cloud_node_kitti_bin", "os1_cloud_node_semantickitti_label_id")
         labelfile = labelfile.replace("bin", "label")
@@ -102,20 +102,23 @@ if __name__ == "__main__":
         mapper.open_label(labelfile)
         mapper.colorize()
         proj_sem_color = mapper.proj_sem_color*255
+        salsa_labelfile = labelfile.replace("rellis","salsa")
 
+        label = np.fromfile(salsa_labelfile, dtype=np.int32)
+        label = label.reshape((-1))
+        #print(label)
+        mapper.open_label(salsa_labelfile)
+        mapper.colorize()
+        proj_sem_color_salsa = mapper.proj_sem_color*255
 
         conv_labelfile = labelfile.replace("rellis","kpconv")
 
-        mapper.open_label(conv_labelfile)
+        label = np.fromfile(salsa_labelfile, dtype=np.int32)
+        mapper.open_label(salsa_labelfile)
         mapper.colorize()
         proj_sem_color_kpconv = mapper.proj_sem_color*255
 
 
-        salsa_labelfile = labelfile.replace("rellis","salsa")
-
-        mapper.open_label(salsa_labelfile)
-        mapper.colorize()
-        proj_sem_color_salsa = mapper.proj_sem_color*255
 
         cat_img = np.concatenate((proj_range,proj_sem_color,proj_sem_color_kpconv,proj_sem_color_salsa),axis=0).astype(np.uint8)
         w.append_data(cat_img)
@@ -123,5 +126,6 @@ if __name__ == "__main__":
         #     break
         # else:
         #     count=count+1
+        #break
 
     w.close()
