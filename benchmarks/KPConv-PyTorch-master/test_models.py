@@ -96,7 +96,7 @@ if __name__ == '__main__':
     #       > 'last_XXX': Automatically retrieve the last trained model on dataset XXX
     #       > '(old_)results/Log_YYYY-MM-DD_HH-MM-SS': Directly provide the path of a trained model
 
-    chosen_log = 'results/Log_2020-10-11_20-01-55/'  # => ModelNet40
+    chosen_log = '/home/usl/Code/Peng/data_collection/benchmarks/KPConv-PyTorch-master/results/Log_2020-10-11_20-01-55'  # => ModelNet40
 
     # Choose the index of the checkpoint to load OR None if you want to load the current checkpoint
     chkp_idx = None
