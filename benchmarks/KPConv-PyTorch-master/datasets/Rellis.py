@@ -193,7 +193,7 @@ class RellisDataset(PointCloudDataset):
         if set == 'training':
             N = int(np.ceil(config.epoch_steps * self.batch_num * 1.1))
         else:
-            N = int(np.ceil(config.validation_size * self.batch_num * 1.1))
+            N = int(np.ceil(config.validation_size * self.batch_num))
         self.epoch_i = torch.from_numpy(np.zeros((1,), dtype=np.int64))
         self.epoch_inds = torch.from_numpy(np.zeros((N,), dtype=np.int64))
         self.epoch_labels = torch.from_numpy(np.zeros((N,), dtype=np.int32))
