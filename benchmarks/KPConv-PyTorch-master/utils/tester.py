@@ -26,6 +26,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+import os
 from os import makedirs, listdir
 from os.path import exists, join
 import time
@@ -782,6 +783,7 @@ class ModelTester:
         ############
 
         # Choose validation smoothing parameter (0 for no smothing, 0.99 for big smoothing)
+        print(f"test_loader.dataset.set: {test_loader.dataset.set}")
         test_smooth = 0.5
         last_min = -0.5
         softmax = torch.nn.Softmax(1)
@@ -999,14 +1001,14 @@ class ModelTester:
 
             # Update minimum od potentials
             new_min = torch.min(test_loader.dataset.potentials)
-            print('Test epoch {:d}, end. Min potential = {:.1f}'.format(test_epoch, new_min))
+            print('Test epoch {:d}, end. Min potential = {:.1f} Last pot = {:f}'.format(test_epoch, new_min,last_min))
 
             if last_min + 1 < new_min:
 
                 # Update last_min
                 last_min += 1
 
-                if test_loader.dataset.set in ['validation','test'] and last_min % 1 == 0:
+                if test_loader.dataset.set in ['validation','test']:
 
                     #####################################
                     # Results on the whole validation set
@@ -1029,7 +1031,7 @@ class ModelTester:
                     for i, seq_frames in enumerate(test_loader.dataset.frames):
                         seq = test_loader.dataset.sequences[i]
                         seq_folder = os.path.join(config.sv_path,'kpconv',seq,"os1_cloud_node_semantickitti_label_id")
-                        if os.path.exists(seq_folder):
+                        if not os.path.exists(seq_folder):
                             os.makedirs(seq_folder)
                         for j, frame in enumerate(seq_frames):
                             frame_path = os.path.join(seq_folder,frame+'.label')
