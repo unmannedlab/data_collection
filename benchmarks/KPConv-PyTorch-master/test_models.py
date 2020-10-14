@@ -150,8 +150,8 @@ if __name__ == '__main__':
     config.input_threads = 10
     config.sv_path = "/home/usl/Datasets"
     config.data_path = "/home/usl/Datasets/rellis"
-    config.val_batch_num = 1
-    config.validation_size = 3343
+    config.val_batch_num = 3
+    config.validation_size = 1114
 
 
     ##############
