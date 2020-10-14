@@ -102,7 +102,7 @@ if __name__ == '__main__':
     chkp_idx = None
 
     # Choose to test on validation or test split
-    on_val = True
+    on_val = False
 
     # Deal with 'last_XXXXXX' choices
     chosen_log = model_choice(chosen_log)
@@ -150,6 +150,8 @@ if __name__ == '__main__':
     config.input_threads = 10
     config.sv_path = "/home/usl/Datasets"
     config.data_path = "/home/usl/Datasets/rellis"
+    config.batch_num = 1
+    config.validation_size = 3343
 
 
     ##############
