@@ -149,7 +149,8 @@ if __name__ == '__main__':
     config.validation_size = 200
     config.input_threads = 10
     config.sv_path = "/home/usl/Datasets"
-    config.dataset_task = "rellis_segmentation"
+    config.data_path = "/home/usl/Datasets/rellis"
+
 
     ##############
     # Prepare Data
@@ -215,6 +216,7 @@ if __name__ == '__main__':
     print('**********\n')
 
     # Training
+    config.dataset_task = "rellis_segmentation"
     if config.dataset_task == 'classification':
         tester.classification_test(net, test_loader, config)
     elif config.dataset_task == 'cloud_segmentation':
