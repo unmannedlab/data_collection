@@ -8,6 +8,7 @@ from skimage import color
 import argparse
 import matplotlib.pyplot as plt
 from benchmarks.SalsaNext.train.common.laserscan import SemLaserScan
+import random
 
 
 EXTENSIONS_SCAN = ['.bin']
@@ -76,7 +77,7 @@ def hex2rgb(s):
 color_dict = {i[0]: hex2rgb(i[1]) for i in color_dict.items()}
 
 if __name__ == "__main__":
-    filename = "pt_train"
+    filename = "pt_test"
     root_path = "/home/usl/Datasets/rellis"
     list_path = f"/home/usl/Datasets/rellis/{filename}.lst"
     mapper = SemLaserScan(sem_color_dict=color_dict, project=True, H=64, W=1024, fov_up=22.5,
@@ -87,6 +88,8 @@ if __name__ == "__main__":
     #img_list = get_files_list(dataset_path)
     max_num = 100
     count = 0
+    random.shuffle(label_list)
+    print(label_list)
     for scanfile in tqdm(label_list):
         #print(scanfile)
         scanfile = os.path.join(root_path,scanfile[0])
@@ -106,7 +109,7 @@ if __name__ == "__main__":
 
         label = np.fromfile(salsa_labelfile, dtype=np.int32)
         label = label.reshape((-1))
-        #print(label)
+        print(np.unique(label))
         mapper.open_label(salsa_labelfile)
         mapper.colorize()
         proj_sem_color_salsa = mapper.proj_sem_color*255

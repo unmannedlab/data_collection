@@ -225,6 +225,7 @@ class User():
         else:
             proj_output = self.model(proj_in)
             proj_argmax = proj_output[0].argmax(dim=0)
+            print(np.unique(proj_argmax.cpu().numpy()))
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             res = time.time() - end
