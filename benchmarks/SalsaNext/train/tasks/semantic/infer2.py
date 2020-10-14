@@ -54,6 +54,7 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--monte-carlo', '-c',
+        dest = "mc",
         type=int, default=30,
         help='Number of samplings per scan'
     )
@@ -102,30 +103,33 @@ if __name__ == '__main__':
         quit()
 
     # create log folder
-    try:
-        if os.path.isdir(FLAGS.log):
-            shutil.rmtree(FLAGS.log)
-        os.makedirs(FLAGS.log)
-        os.makedirs(os.path.join(FLAGS.log, "sequences"))
-        for seq in DATA["split"]["train"]:
-            seq = '{0:02d}'.format(int(seq))
-            print("train", seq)
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
-        for seq in DATA["split"]["valid"]:
-            seq = '{0:02d}'.format(int(seq))
-            print("valid", seq)
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
-        for seq in DATA["split"]["test"]:
-            seq = '{0:02d}'.format(int(seq))
-            print("test", seq)
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
-            os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
-    except Exception as e:
-        print(e)
-        print("Error creating log directory. Check permissions!")
-        raise
+    # try:
+    #     if os.path.isdir(FLAGS.log):
+    #         shutil.rmtree(FLAGS.log)
+    #     os.makedirs(FLAGS.log)
+    #     os.makedirs(os.path.join(FLAGS.log, "sequences"))
+    #     for seq in DATA["split"]["train"]:
+    #         print(seq)
+    #         seq = '{0:02d}'.format(int(float(seq)))
+    #         print("train", seq)
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
+    #     for seq in DATA["split"]["valid"]:
+    #         print(seq)
+    #         seq = '{0:02d}'.format(int(float(seq)))
+    #         print("valid", seq)
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
+    #     for seq in DATA["split"]["test"]:
+    #         print(seq)
+    #         seq = '{0:02d}'.format(int(float(seq)))
+    #         print("test", seq)
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq))
+    #         os.makedirs(os.path.join(FLAGS.log, "sequences", seq, "predictions"))
+    # except Exception as e:
+    #     print(e)
+    #     print("Error creating log directory. Check permissions!")
+    #     raise
 
     except Exception as e:
         print(e)

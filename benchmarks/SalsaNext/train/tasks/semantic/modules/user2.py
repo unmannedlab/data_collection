@@ -17,7 +17,7 @@ import os
 import numpy as np
 
 from tasks.semantic.modules.SalsaNext import *
-from tasks.semantic.modules.SalsaNextUncertainty import *
+from tasks.semantic.modules.SalsaNextAdf import *
 from tasks.semantic.postproc.KNN import KNN
 
 
@@ -271,5 +271,8 @@ class User():
 
             # save scan
             path = os.path.join(self.logdir, "salsa",
-                                path_seq, "os1_cloud_node_semantickitti_label_id", path_name)
-            pred_np.tofile(path)
+                                path_seq, "os1_cloud_node_semantickitti_label_id")
+            if not os.path.exists(path):
+                os.makedirs(path)
+            data_path = os.path.join(path,path_name)
+            pred_np.tofile(data_path)
