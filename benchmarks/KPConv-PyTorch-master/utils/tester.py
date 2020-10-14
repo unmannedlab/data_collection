@@ -605,8 +605,8 @@ class ModelTester:
 
                         # Save some of the frame pots
                         if f_ind % 20 == 0:
-                            seq_path = join(self.path, self.sequences[s_ind])
-                            velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind] + '.bin')
+                            seq_path = join(test_loader.dataset.path, 'sequences', test_loader.dataset.sequences[s_ind])
+                            velo_file = join(seq_path, 'velodyne', test_loader.dataset.frames[s_ind][f_ind] + '.bin')in')
                             frame_points = np.fromfile(velo_file, dtype=np.float32)
                             frame_points = frame_points.reshape((-1, 4))
                             predpath = join(test_path, pred_folder, filename[:-4] + '.ply')
@@ -649,8 +649,8 @@ class ModelTester:
                                                                                      axis=1)].astype(np.int32)
 
                             # Load points
-                            seq_path = join(self.path, self.sequences[s_ind])
-                            velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind] + '.bin')
+                            seq_path = join(test_loader.dataset.path, 'sequences', test_loader.dataset.sequences[s_ind])
+                            velo_file = join(seq_path, 'velodyne', test_loader.dataset.frames[s_ind][f_ind] + '.bin')
                             frame_points = np.fromfile(velo_file, dtype=np.float32)
                             frame_points = frame_points.reshape((-1, 4))
                             predpath = join(test_path, pred_folder, filename[:-4] + '.ply')
@@ -913,8 +913,9 @@ class ModelTester:
 
                         # Save some of the frame pots
                         if f_ind % 20 == 0:
-                            seq_path = join(test_loader.dataset.path, 'sequences', test_loader.dataset.sequences[s_ind])
-                            velo_file = join(seq_path, 'velodyne', test_loader.dataset.frames[s_ind][f_ind] + '.bin')
+
+                            seq_path = join(self.path, self.sequences[s_ind])
+                            velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind] + '.bin')
                             frame_points = np.fromfile(velo_file, dtype=np.float32)
                             frame_points = frame_points.reshape((-1, 4))
                             predpath = join(test_path, pred_folder, filename[:-4] + '.ply')
@@ -957,8 +958,8 @@ class ModelTester:
                                                                                      axis=1)].astype(np.int32)
 
                             # Load points
-                            seq_path = join(test_loader.dataset.path, 'sequences', test_loader.dataset.sequences[s_ind])
-                            velo_file = join(seq_path, 'velodyne', test_loader.dataset.frames[s_ind][f_ind] + '.bin')
+                            seq_path = join(self.path, self.sequences[s_ind])
+                            velo_file = join(seq_path, 'os1_cloud_node_kitti_bin', self.frames[s_ind][f_ind] + '.bin')
                             frame_points = np.fromfile(velo_file, dtype=np.float32)
                             frame_points = frame_points.reshape((-1, 4))
                             predpath = join(test_path, pred_folder, filename[:-4] + '.ply')
