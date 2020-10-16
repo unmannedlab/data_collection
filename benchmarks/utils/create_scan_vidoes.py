@@ -88,8 +88,8 @@ if __name__ == "__main__":
     #img_list = get_files_list(dataset_path)
     max_num = 100
     count = 0
-    random.shuffle(label_list)
-    print(label_list)
+    #random.shuffle(label_list)
+    #print(label_list)
     for scanfile in tqdm(label_list):
         #print(scanfile)
         scanfile = os.path.join(root_path,scanfile[0])
@@ -107,17 +107,16 @@ if __name__ == "__main__":
         proj_sem_color = mapper.proj_sem_color*255
         salsa_labelfile = labelfile.replace("rellis","salsa")
 
-        label = np.fromfile(salsa_labelfile, dtype=np.int32)
-        label = label.reshape((-1))
-        print(np.unique(label))
+
         mapper.open_label(salsa_labelfile)
         mapper.colorize()
         proj_sem_color_salsa = mapper.proj_sem_color*255
 
         conv_labelfile = labelfile.replace("rellis","kpconv")
-
-        label = np.fromfile(salsa_labelfile, dtype=np.int32)
-        mapper.open_label(salsa_labelfile)
+        label = np.fromfile(conv_labelfile, dtype=np.int32)
+        label = label.reshape((-1))
+        #print(np.unique(label))
+        mapper.open_label(conv_labelfile)
         mapper.colorize()
         proj_sem_color_kpconv = mapper.proj_sem_color*255
 

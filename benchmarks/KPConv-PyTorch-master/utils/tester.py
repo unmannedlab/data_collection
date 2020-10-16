@@ -803,7 +803,7 @@ class ModelTester:
             if not exists(report_path):
                 makedirs(report_path)
 
-        if test_loader.dataset.set == ['validation','test']:
+        if test_loader.dataset.set in ['validation','test']:
             for folder in ['val_predictions', 'val_probs']:
                 if not exists(join(test_path, folder)):
                     makedirs(join(test_path, folder))
@@ -1034,8 +1034,10 @@ class ModelTester:
                         if not os.path.exists(seq_folder):
                             os.makedirs(seq_folder)
                         for j, frame in enumerate(seq_frames):
+                            #print(test_loader.dataset.label_values)
                             frame_path = os.path.join(seq_folder,frame+'.label')
-                            all_f_preds[i][j].tofile(frame_path)
+                            tmp_preds = test_loader.dataset.learning_map_inv[all_f_preds[i][j]] 
+                            tmp_preds.tofile(frame_path)
 
                         val_preds += [np.hstack(all_f_preds[i])]
                         val_labels += [np.hstack(all_f_labels[i])]

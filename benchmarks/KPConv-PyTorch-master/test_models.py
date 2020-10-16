@@ -96,7 +96,7 @@ if __name__ == '__main__':
     #       > 'last_XXX': Automatically retrieve the last trained model on dataset XXX
     #       > '(old_)results/Log_YYYY-MM-DD_HH-MM-SS': Directly provide the path of a trained model
 
-    chosen_log = '/home/usl/Code/Peng/data_collection/benchmarks/KPConv-PyTorch-master/results/Log_2020-10-11_20-01-55'  # => ModelNet40
+    chosen_log = '/home/usl/Code/Peng/data_collection/benchmarks/KPConv-PyTorch-master/results/Log_2020-10-14_21-32-45'  # => ModelNet40
 
     # Choose the index of the checkpoint to load OR None if you want to load the current checkpoint
     chkp_idx = None
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     ############################
 
     # Set which gpu is going to be used
-    GPU_ID = '0'
+    GPU_ID = '0,1'
 
     # Set GPU visible device
     os.environ['CUDA_VISIBLE_DEVICES'] = GPU_ID
@@ -150,8 +150,8 @@ if __name__ == '__main__':
     config.input_threads = 10
     config.sv_path = "/home/usl/Datasets"
     config.data_path = "/home/usl/Datasets/rellis"
-    config.val_batch_num = 1
-    config.validation_size = 3343
+    config.val_batch_num = 30
+    config.validation_size = 100
 
 
     ##############
@@ -226,6 +226,6 @@ if __name__ == '__main__':
     elif config.dataset_task == 'slam_segmentation':
         tester.slam_segmentation_test(net, test_loader, config)
     elif config.dataset_task == "rellis_segmentation":
-        tester.rellis_segmentation_test(net, test_loader, config)
+        tester.rellis_segmentation_test(net, test_loader, config,num_votes=100)
     else:
         raise ValueError('Unsupported dataset_task for testing: ' + config.dataset_task)
