@@ -10,9 +10,14 @@ import multiprocessing
 def single_count(file_path):
     label = np.array(Image.open(file_path))
     #print(file_path)
-    label = label[:, :]
+    #print(label.shape)
+    if (file_path.find("jpg") != -1):
+        label = label[:, :,0]
+        file_path = file_path.replace("jpg","png")
+    else:
+        label = label[:, :]
     unique, unique_counts = np.unique(label, return_counts=True)
-    if 1 in unique:
+    if 255 in unique:
         print(file_path)
         colorid_path = file_path.replace("pylon_camera_node_label_id","pylon_camera_node_label_color")
         img_path = file_path.replace("pylon_camera_node_label_id","pylon_camera_node")
@@ -55,7 +60,7 @@ img_list = [line.strip().split() for line in open(list_path)]
 
 label_list = [os.path.join(root_path,i[1]) for i in img_list]
 label_list = [i.replace("pylon_camera_node_label_color","pylon_camera_node_label_id") for i in label_list]
-print(label_list[0])
+#print(label_list[0])
 count_dict = count_label(label_list,7)
 with open(f"{filename}.pkl",'wb') as f:
     pickle.dump(count_dict,f)
