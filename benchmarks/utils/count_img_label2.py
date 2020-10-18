@@ -48,9 +48,9 @@ def count_label(label_paths,num_workers):
     print(len(count_dict))
     return count_dict
 
-filename = "val"
+filename = "all"
 root_path = "/home/usl/Datasets/rellis"
-list_path = f"/home/usl/Datasets/rellis/split/{filename}.lst"
+list_path = f"/home/usl/Datasets/rellis/{filename}.lst"
 img_list = [line.strip().split() for line in open(list_path)]
 
 label_list = [os.path.join(root_path,i[1]) for i in img_list]
