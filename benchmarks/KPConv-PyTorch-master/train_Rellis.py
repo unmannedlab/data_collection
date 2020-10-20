@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
     # Initialize datasets
     training_dataset = RellisDataset(config, set='training',
-                                            balance_classes=False)
+                                            balance_classes=True)
     test_dataset = RellisDataset(config, set='validation',
                                         balance_classes=False)
 
