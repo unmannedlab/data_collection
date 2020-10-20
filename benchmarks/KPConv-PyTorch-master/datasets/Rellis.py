@@ -235,7 +235,6 @@ class RellisDataset(PointCloudDataset):
         batch_n = 0
 
         while True:
-
             t += [time.time()]
 
             with self.worker_lock:
@@ -320,7 +319,10 @@ class RellisDataset(PointCloudDataset):
                 # In case radius smaller than 50m, chose new center on a point of the wanted class or not
                 if self.in_R < 50.0 and f_inc == 0:
                     if self.balance_classes:
-                        wanted_ind = np.random.choice(np.where(sem_labels == wanted_label)[0])
+                        if len(np.where(sem_labels == wanted_label)[0]) == 0:
+                            wanted_ind = np.random.choice(new_points.shape[0])
+                        else:
+                            wanted_ind = np.random.choice(np.where(sem_labels == wanted_label)[0])
                     else:
                         wanted_ind = np.random.choice(new_points.shape[0])
                     p0 = new_points[wanted_ind, :3]
@@ -839,13 +841,19 @@ class RellisSampler(Sampler):
             # Generate a list of indices balancing classes and respecting potentials
             gen_indices = []
             gen_classes = []
+            used_classes = self.dataset.num_classes - len(self.dataset.ignored_labels)
             for i, c in enumerate(self.dataset.label_values):
                 if c not in self.dataset.ignored_labels:
+                    class_potentials = self.dataset.potentials[self.dataset.class_frames[i]]
+                    if class_potentials.shape[0] ==0 :
+                        used_classes = used_classes -1
+            class_n = num_centers // used_classes + 1
+            for i, c in enumerate(self.dataset.label_values):
+                if c not in self.dataset.ignored_labels and self.dataset.potentials[self.dataset.class_frames[i]].shape[0]!=0:
 
 
                     # Get the indices to generate thanks to potentials
-                    used_classes = self.dataset.num_classes - len(self.dataset.ignored_labels)
-                    class_n = num_centers // used_classes + 1
+
 
                     # Get the potentials of the frames containing this class
                     class_potentials = self.dataset.potentials[self.dataset.class_frames[i]]
