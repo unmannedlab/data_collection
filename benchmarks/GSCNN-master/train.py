@@ -165,8 +165,10 @@ def main():
                 if not os.path.exists(seg_path):
                     os.makedirs(seg_path)
                 edge_path = os.path.join(test_sv_path,"gscnn","edge",seq)
+                edgenp_path = os.path.join(test_sv_path,"gscnn","edgenp",seq)
                 if not os.path.exists(edge_path):
                     os.makedirs(edge_path)
+                    os.makedirs(edgenp_path)
                 seg_arg = np.argmax(seg_predictions[i],axis=0).astype(np.uint8)
                 edge_arg = np.argmax(edge_predictions[i],axis=0).astype(np.uint8)
 
@@ -176,6 +178,7 @@ def main():
                 seg_img.save(os.path.join(seg_path,file_name))
                 edge_img = Image.fromarray(edge_img)
                 edge_img.save(os.path.join(edge_path,file_name))
+                np.save(os.path.join(edge_path,file_name.replace("png","npy")),edge_predictions[i])
 
         return
 
